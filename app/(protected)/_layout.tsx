@@ -1,5 +1,5 @@
-import { Slot, Redirect } from 'expo-router';
-import { useUserStore } from '@/store/userStore';
+import { Slot, Redirect } from "expo-router";
+import { useUserStore } from "@/store/userStore";
 
 export default function ProtectedLayout() {
   const user = useUserStore((state) => state.user);

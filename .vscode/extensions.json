@@ -1,0 +1,21 @@
+{
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "csstools.postcss",
+    "dbaeumer.vscode-eslint",
+    "dotenv.dotenv-vscode",
+    "dsznajder.es7-react-js-snippets",
+    "esbenp.prettier-vscode",
+    "GitHub.copilot",
+    "gluestack.gluestack-vscode",
+    "mhutchie.git-graph",
+    "mikestead.dotenv",
+    "mintlify.document",
+    "msjsdiag.vscode-react-native",
+    "Orta.vscode-jest",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "vscode-icons-team.vscode-icons",
+    "xabikos.JavaScriptSnippets",
+    "yoavbls.pretty-ts-errors"
+  ]
+}
