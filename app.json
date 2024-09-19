@@ -1,36 +1,34 @@
 {
-	"expo": {
-		"android": {
-			"adaptiveIcon": {
-				"backgroundColor": "#ffffff",
-				"foregroundImage": "./assets/images/adaptive-icon.png"
-			}
-		},
-		"experiments": {
-			"typedRoutes": true
-		},
-		"icon": "./assets/images/icon.png",
-		"ios": {
-			"supportsTablet": true
-		},
-		"name": "cimat-inv",
-		"orientation": "portrait",
-		"plugins": [
-			"expo-router"
-		],
-		"scheme": "cimat-inv",
-		"slug": "cimat-inv",
-		"splash": {
-			"backgroundColor": "#ffffff",
-			"image": "./assets/images/splash.png",
-			"resizeMode": "contain"
-		},
-		"userInterfaceStyle": "automatic",
-		"version": "1.0.0",
-		"web": {
-			"bundler": "metro",
-			"favicon": "./assets/images/favicon.png",
-			"output": "static"
-		}
-	}
+  "expo": {
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/images/adaptive-icon.png"
+      }
+    },
+    "experiments": {
+      "typedRoutes": true
+    },
+    "icon": "./assets/images/icon.png",
+    "ios": {
+      "supportsTablet": true
+    },
+    "name": "cimat-inv",
+    "orientation": "portrait",
+    "plugins": ["expo-router"],
+    "scheme": "cimat-inv",
+    "slug": "cimat-inv",
+    "splash": {
+      "backgroundColor": "#ffffff",
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain"
+    },
+    "userInterfaceStyle": "automatic",
+    "version": "1.0.0",
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png",
+      "output": "static"
+    }
+  }
 }

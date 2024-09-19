@@ -1,0 +1,18 @@
+{
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "search.exclude": {
+    "package-lock.json": true
+  },
+  "editor.codeActionsOnSave": ["source.addMissingImports", "source.fixAll.eslint"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.colorTheme": "Min Dark",
+  "tailwindCSS.experimental.classRegex": [["tva\\((([^()]*|\\([^()]*\\))*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]],
+  "eslint.enable": true,
+  "eslint.lintTask.enable": true,
+  "eslint.options": {
+    "extensions": [".ts", ".tsx", ".js", ".jsx"]
+  }
+}
