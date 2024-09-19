@@ -54,13 +54,13 @@ Para sistemas Unix, utilizaremos la versión estándar de nvm.
    - Usando cURL:
 
      ```bash
-     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
      ```
 
    - Usando Wget:
 
      ```bash
-     wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+     wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
      ```
 
 2. **Actualizar variables de entorno**:
@@ -68,8 +68,7 @@ Para sistemas Unix, utilizaremos la versión estándar de nvm.
    - Añade las siguientes líneas a tu archivo `~/.bashrc`, `~/.zshrc` o `~/.profile`, dependiendo de tu shell:
 
      ```bash
-     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
      ```
 
    - Luego, recarga el archivo de configuración o abre una nueva terminal:
