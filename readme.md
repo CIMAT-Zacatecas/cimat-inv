@@ -27,24 +27,24 @@
 
 ### En Windows
 
-Para Windows, instalaremos **fnm** utilizando PowerShell.
+Para Windows, instalaremos **fnm** utilizando `winget` en PowerShell.
 
 1. **Instalar fnm**:
 
    - Abre **PowerShell**.
 
-   - Ejecuta el siguiente comando para instalar fnm:
+   - Ejecuta el siguiente comando para instalar `fnm`:
 
      ```powershell
-     iwr https://fnm.vercel.app/install | iex
+     winget install Schniz.fnm
      ```
 
 2. **Actualizar variables de entorno**:
 
-   - Añade lo siguiente a tu perfil de PowerShell para cargar fnm al iniciar:
+   - Añade lo siguiente a tu perfil de PowerShell para cargar `fnm` al iniciar y al cambiar de directorio:
 
      ```powershell
-     fnm env --use-on-cd | Out-String | Invoke-Expression
+     fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
      ```
 
    - Puedes editar tu perfil de PowerShell ejecutando:
@@ -263,4 +263,4 @@ Si tienes alguna duda o encuentras algún problema al configurar el proyecto, no
 
 ---
 
-¡Gracias por formar parte del equipo y contribuir al proyecto!
+¡Gracias por formar parte del equipo y contribuir al proyecto! 🚀
