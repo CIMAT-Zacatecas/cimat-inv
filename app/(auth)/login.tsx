@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Keyboard, Text } from "react-native";
+import { Alert, Keyboard, Text, Image, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserStore } from "@/store/userStore";
 import { supabase } from "@/lib/supabase";
@@ -84,9 +84,14 @@ export default function LoginScreen() {
   return (
     <Container style={{ justifyContent: "center" }}>
       <VStack space="md">
-        <Text>Logo</Text>
-        <Text>Bienvenido</Text>
-        <Text>Ingresa tus datos para iniciar sesión</Text>
+        <View style={{ alignItems: "center" }}>
+          <Image
+            source={require("@/assets/images/cimat.png")}
+            style={{ height: 150, resizeMode: "contain", marginBottom: 8 }}
+          />
+          <Text style={{ fontWeight: "600", marginBottom: 4 }}>Bienvenido</Text>
+          <Text style={{ fontWeight: "300" }}>Ingresa tus datos para iniciar sesión</Text>
+        </View>
 
         <FormControl isInvalid={!!errors.email}>
           <FormControlLabel>
