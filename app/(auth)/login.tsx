@@ -1,77 +1,167 @@
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, Keyboard, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserStore } from "@/store/userStore";
 import { supabase } from "@/lib/supabase";
-import { Input, InputField } from "@/components/ui/input";
-import { Button, ButtonText } from "@/components/ui/button";
-import { VStack } from "@/components/ui/vstack";
-import { Text } from "@/components/ui/text";
+
 import type { Profile } from "@/types/profile";
+import { useForm, Controller } from "react-hook-form";
+import LoadingOverlay from "@/components/ui/loading-overlay";
+import { VStack } from "@/components/ui/vstack";
+import Container from "@/components/ui/container";
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlLabel,
+  FormControlLabelText,
+} from "@/components/ui/form-control";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { AlertCircleIcon, EyeIcon, EyeOffIcon } from "@/components/ui/icon";
+import { Button, ButtonText } from "@/components/ui/button";
+import EmailValidator from "@/lib/email-validator";
+
+interface FormData {
+  email: string;
+  password: string;
+}
 
 export default function LoginScreen() {
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const emailValidator = new EmailValidator();
 
-  const handleLogin = async () => {
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-    if (authError) {
-      Alert.alert("Error", authError.message);
-      return;
+  const onSubmit = async (data: FormData) => {
+    Keyboard.dismiss();
+    setIsLoading(true);
+
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (authError) throw authError;
+
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authData.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const profile = profileData as Profile;
+      const user = { authUser: authData.user, profile };
+      setUser(user);
+
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An unknown error occurred");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    // Fetch the user's profile
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", authData.user.id)
-      .single();
-
-    if (profileError) {
-      Alert.alert("Error", profileError.message);
-      return;
-    }
-
-    const profile = profileData as Profile;
-    const user = { authUser: authData.user, profile };
-    setUser(user);
-
-    // Navigate to Home after successful login
-    router.replace("/");
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
-    <View style={styles.container}>
+    <Container style={{ justifyContent: "center" }}>
       <VStack space="md">
         <Text>Logo</Text>
         <Text>Bienvenido</Text>
         <Text>Ingresa tus datos para iniciar sesión</Text>
-        <Input>
-          <InputField
-            placeholder="Correo electrónico"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
+
+        <FormControl isInvalid={!!errors.email}>
+          <FormControlLabel>
+            <FormControlLabelText>Correo electrónico</FormControlLabelText>
+          </FormControlLabel>
+          <Controller
+            control={control}
+            rules={{
+              required: "El correo electrónico es obligatorio",
+              validate: (value) => emailValidator.validate(value) || "Correo electrónico inválido",
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input>
+                <InputField
+                  placeholder="Correo electrónico"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </Input>
+            )}
+            name="email"
           />
-        </Input>
-        <Input>
-          <InputField placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry />
-        </Input>
-        <Button onPress={handleLogin}>
-          <ButtonText>Iniciar sesión</ButtonText>
+          <FormControlError>
+            <FormControlErrorIcon as={AlertCircleIcon} />
+            <FormControlErrorText>{errors.email?.message}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl isInvalid={!!errors.password}>
+          <FormControlLabel>
+            <FormControlLabelText>Contraseña</FormControlLabelText>
+          </FormControlLabel>
+          <Controller
+            control={control}
+            rules={{
+              required: "La contraseña es obligatoria",
+              minLength: {
+                value: 8,
+                message: "La contraseña debe tener al menos 8 caracteres",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input>
+                <InputField
+                  placeholder="Contraseña"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  secureTextEntry={!showPassword}
+                />
+                <InputSlot onPress={togglePasswordVisibility}>
+                  <InputIcon as={showPassword ? EyeOffIcon : EyeIcon} />
+                </InputSlot>
+              </Input>
+            )}
+            name="password"
+          />
+          <FormControlError>
+            <FormControlErrorIcon as={AlertCircleIcon} />
+            <FormControlErrorText>{errors.password?.message}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
+          <ButtonText>{isLoading ? "Iniciando sesión..." : "Iniciar sesión"}</ButtonText>
+        </Button>
+
+        <Button variant="link" onPress={() => router.replace("/restore-password")} isDisabled={isLoading}>
+          <ButtonText>Restablecer contraseña</ButtonText>
         </Button>
       </VStack>
-    </View>
+      <LoadingOverlay isLoading={isLoading} />
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-});

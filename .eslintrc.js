@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["expo", "plugin:tailwindcss/recommended", "prettier"],
+  extends: ["expo", "plugin:tailwindcss/recommended", "eslint-config-prettier", "prettier"],
   plugins: ["prettier", "react-native"],
   rules: {
     "prettier/prettier": "warn",

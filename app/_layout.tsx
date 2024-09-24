@@ -3,7 +3,7 @@ import "@/global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Slot, SplashScreen } from "expo-router";
+import { Slot, SplashScreen, useRouter } from "expo-router";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
@@ -35,6 +35,7 @@ export default function RootLayout() {
   // Initialize user session
   const setUser = useUserStore((state) => state.setUser);
   const clearUser = useUserStore((state) => state.clearUser);
+  const router = useRouter();
 
   useEffect(() => {
     if (error) throw error;
@@ -77,13 +78,16 @@ export default function RootLayout() {
       } else if (event === "SIGNED_OUT") {
         clearUser();
       }
+
+      if (event === "PASSWORD_RECOVERY") {
+        router.push("/reset-password");
+      }
     });
 
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [clearUser, setUser]); // Include clearUser and setUser in the dependency array
-
+  }, [clearUser, setUser, router]);
   if (!loaded) {
     return null;
   }
