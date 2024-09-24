@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/lib/supabase";
@@ -44,13 +44,6 @@ export default function ResetPasswordScreen() {
   });
 
   const newPassword = watch("newPassword");
-
-  useEffect(() => {
-    if (!token) {
-      Alert.alert("Error", "No se ha proporcionado un token válido para restablecer la contraseña.");
-      router.replace("/login");
-    }
-  }, [token, router]);
 
   const onSubmit = async (data: FormData) => {
     if (!token) return;
