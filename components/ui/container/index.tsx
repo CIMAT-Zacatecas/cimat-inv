@@ -1,5 +1,5 @@
 import React from "react";
-import { View, ViewProps, StyleSheet } from "react-native";
+import { View, ViewProps, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 
 interface ContainerProps extends ViewProps {
   children: React.ReactNode;
@@ -7,9 +7,11 @@ interface ContainerProps extends ViewProps {
 
 const Container: React.FC<ContainerProps> = ({ children, style, ...props }) => {
   return (
-    <View style={[styles.container, style]} {...props}>
-      {children}
-    </View>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <View style={[styles.container, style]} {...props}>
+        {children}
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
