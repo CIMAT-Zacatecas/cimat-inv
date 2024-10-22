@@ -1,12 +1,15 @@
 import { Redirect } from "expo-router";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useUserStore } from "@/store/userStore";
-import { Icon, StarIcon } from "@/components/ui/icon";
+import { Icon } from "@/components/ui/icon";
 import HomeScreen from ".";
 import MyProfile from "./my-profile";
 import AdminDashboard from "./admin-dashboard";
 import Inventary from "./inventary";
 import Scanner from "./scanner";
+import { ArrowLeftRight, CircleUser, Home, LayoutDashboard, QrCode, Users, Warehouse } from "lucide-react-native";
+import Transfers from "./transfers";
+import UsersManagement from "./users-management";
 
 const Tab = createBottomTabNavigator();
 
@@ -27,11 +30,21 @@ export default function ProtectedLayout() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconComponent;
 
-          if (route.name === "Dashboard" || "Inicio") {
-            iconComponent = StarIcon;
+          if (route.name === "Dashboard") {
+            iconComponent = LayoutDashboard;
+          } else if (route.name === "Inventario") {
+            iconComponent = Warehouse;
+          } else if (route.name === "QR") {
+            iconComponent = QrCode;
+          } else if (route.name === "Usuarios") {
+            iconComponent = Users;
+          } else if (route.name === "Transferencias") {
+            iconComponent = ArrowLeftRight;
+          } else if (route.name === "Mi Perfil") {
+            iconComponent = CircleUser;
+          } else if (route.name === "Inicio") {
+            iconComponent = Home;
           }
-          // else if (route.name === "Inventario") {
-          //   iconComponent = StarIcon;
 
           return <Icon as={iconComponent} size="xl" />;
         },
@@ -43,8 +56,8 @@ export default function ProtectedLayout() {
           <Tab.Screen name="Dashboard" component={AdminDashboard} />
           <Tab.Screen name="Inventario" component={Inventary} />
           <Tab.Screen name="QR" component={Scanner} />
-          <Tab.Screen name="Usuario" component={Scanner} />
-          <Tab.Screen name="Transferencias" component={Scanner} />
+          <Tab.Screen name="Usuarios" component={UsersManagement} />
+          <Tab.Screen name="Transferencias" component={Transfers} />
         </>
       ) : (
         <>
@@ -52,11 +65,6 @@ export default function ProtectedLayout() {
         </>
       )}
       <Tab.Screen name="Mi Perfil" component={MyProfile} />
-      {/* <Tab.Screen name="Inicio" component={HomeScreen} />
-      <Tab.Screen name="Inventario" component={HomeScreen} />
-      <Tab.Screen name="QR" component={HomeScreen} />
-      <Tab.Screen name="Usuarios" component={HomeScreen} />
-      <Tab.Screen name="Mi perfil" component={MyProfile} /> */}
     </Tab.Navigator>
   );
 }
