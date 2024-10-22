@@ -18,7 +18,15 @@
     "name": "cimat-inv",
     "orientation": "portrait",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permita que $(PRODUCT_NAME) acceda a su cámara."
+          // "microphonePermission": "Permita que $(PRODUCT_NAME) to access your microphone",
+          // "recordAudioAndroid": true
+        }
+      ]
     ],
     "scheme": "cimat-inv",
     "slug": "cimat-inv",
