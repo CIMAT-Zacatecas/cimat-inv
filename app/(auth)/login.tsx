@@ -87,10 +87,10 @@ export default function LoginScreen() {
         <View style={{ alignItems: "center" }}>
           <Image
             source={require("@/assets/images/cimat.png")}
-            style={{ height: 150, resizeMode: "contain", marginBottom: 8 }}
+            style={{ height: 100, resizeMode: "contain", marginBottom: 10 }}
           />
-          <Text style={{ fontWeight: "600", marginBottom: 4 }}>Bienvenido</Text>
-          <Text style={{ fontWeight: "300" }}>Ingresa tus datos para iniciar sesión</Text>
+          <Text style={{ fontWeight: "600", marginBottom: 4 }}>Sistema de gestión de inventario</Text>
+          {/* <Text style={{ fontWeight: "300" }}>Ingresa tus datos para iniciar sesión</Text> */}
         </View>
 
         <FormControl isInvalid={!!errors.email}>

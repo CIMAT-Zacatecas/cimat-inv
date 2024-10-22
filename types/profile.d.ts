@@ -1,4 +1,5 @@
 export interface Profile {
+  is_admin: boolean;
   id: string;
   updated_at: string | undefined;
   username: string | undefined;
