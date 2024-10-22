@@ -21,7 +21,7 @@ export default function MyProfile() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Mi perfil</Text>
-      <Text style={styles.title}>Welcome, {user?.profile.full_name || user?.authUser.email}!</Text>
+      <Text style={styles.title}>Hola, {user?.profile.full_name || user?.authUser.email}!</Text>
       <Text>{user?.authUser.email}</Text>
       <Button title="Logout" onPress={handleLogout} />
     </View>
