@@ -21,7 +21,7 @@ export default function ProtectedLayout() {
     return <Redirect href="/login" />;
   }
 
-  const isAdmin = user.profile?.is_admin;
+  const isAdmin = user.profile?.id_rol === 1;
 
   return (
     <Tab.Navigator
