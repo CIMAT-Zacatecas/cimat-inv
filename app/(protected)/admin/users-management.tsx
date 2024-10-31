@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet } from "react-native";
 
-export default function Summary() {
+export default function UsersManagement() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Resumen</Text>
+      <Text style={styles.title}>Usuarios</Text>
     </View>
   );
 }
