@@ -5,11 +5,11 @@ import { Icon } from "@/components/ui/icon";
 import HomeScreen from ".";
 import MyProfile from "./my-profile";
 import AdminDashboard from "./admin-dashboard";
-import Inventary from "./inventary";
 import Scanner from "./scanner";
 import { ArrowLeftRight, CircleUser, Home, LayoutDashboard, QrCode, Users, Warehouse } from "lucide-react-native";
 import Transfers from "./transfers";
 import UsersManagement from "./users-management";
+import Inventory from "./inventory";
 
 const Tab = createBottomTabNavigator();
 
@@ -54,7 +54,7 @@ export default function ProtectedLayout() {
       {isAdmin ? (
         <>
           <Tab.Screen name="Dashboard" component={AdminDashboard} />
-          <Tab.Screen name="Inventario" component={Inventary} />
+          <Tab.Screen name="Inventario" component={Inventory} />
           <Tab.Screen name="QR" component={Scanner} />
           <Tab.Screen name="Usuarios" component={UsersManagement} />
           <Tab.Screen name="Transferencias" component={Transfers} />
