@@ -51,6 +51,7 @@
     "@hookform/resolvers": "^3.9.1",
     "@legendapp/motion": "^2.4.0",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/netinfo": "11.3.1",
     "@react-navigation/native": "^6.0.2",
     "@shopify/flash-list": "1.6.4",
     "@supabase/supabase-js": "^2.45.4",
@@ -67,6 +68,7 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
+    "lodash": "^4.17.21",
     "lucide-react-native": "^0.453.0",
     "nativewind": "4.0.36",
     "react": "18.2.0",
@@ -80,12 +82,12 @@
     "react-native-web": "~0.19.10",
     "tailwindcss": "^3.4.11",
     "zod": "^3.23.8",
-    "zustand": "^5.0.0-rc.2",
-    "@react-native-community/netinfo": "11.3.1"
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@testing-library/react-native": "^12.7.2",
+    "@types/lodash": "^4.17.13",
     "@types/react": "~18.2.45",
     "@typescript-eslint/parser": "^8.6.0",
     "eslint": "^8.57.1",
