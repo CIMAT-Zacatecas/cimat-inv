@@ -1,9 +1,36 @@
 import { useEffect, useState } from "react";
-import { Text, ActivityIndicator, ScrollView } from "react-native";
+import { ActivityIndicator } from "react-native";
 import { supabase } from "@/lib/supabase";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableData } from "@/components/ui/table";
 import { Profile } from "@/types/types";
 import Container from "@/components/ui/container";
+import { FlashList } from "@shopify/flash-list";
+import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
+import { Card } from "@/components/ui/card";
+import { Divider } from "@/components/ui/divider";
+import { Text } from "@/components/ui/text";
+import { Separator } from "@/components/ui/separator";
+
+const UserItem = ({ user }: { user: Profile }) => (
+  <Card size="md" variant="elevated">
+    <VStack space="sm">
+      <HStack space="md">
+        <Text bold>Nombre:</Text>
+        <Text>{user.full_name || "No especificado"}</Text>
+      </HStack>
+
+      <HStack space="md">
+        <Text bold>Email:</Text>
+        <Text>{user.username || "No especificado"}</Text>
+      </HStack>
+
+      <HStack space="md">
+        <Text bold>Rol:</Text>
+        <Text>{user.id_rol}</Text>
+      </HStack>
+    </VStack>
+  </Card>
+);
 
 export default function Users() {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -34,7 +61,7 @@ export default function Users() {
 
   if (loading) {
     return (
-      <Container>
+      <Container centered>
         <ActivityIndicator size="large" color="#0000ff" />
         <Text>Cargando usuarios...</Text>
       </Container>
@@ -43,37 +70,24 @@ export default function Users() {
 
   if (users.length === 0) {
     return (
-      <Container>
-        <Text>Usuarios</Text>
+      <Container centered>
+        <Text className="mb-4 text-2xl font-bold">Usuarios</Text>
         <Text>No hay usuarios registrados.</Text>
       </Container>
     );
   }
 
   return (
-    <Container>
-      <Text>Usuarios</Text>
-
-      <ScrollView horizontal={true}>
-        <Table className="w-full">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Rol</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableData>{user.full_name}</TableData>
-                <TableData>{user.username}</TableData>
-                <TableData>{user.id_rol}</TableData>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </ScrollView>
+    <Container removeVerticalPadding>
+      <FlashList
+        ListHeaderComponent={() => <Separator height={8} />}
+        estimatedItemSize={50}
+        data={users}
+        renderItem={({ item }) => <UserItem user={item} />}
+        keyExtractor={(item) => item.id}
+        contentContainerClassName="pb-5"
+        ItemSeparatorComponent={() => <Separator height={8} />}
+      />
     </Container>
   );
 }

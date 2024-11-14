@@ -11,10 +11,6 @@ export default function ItemDetail() {
   const { bien } = useLocalSearchParams();
   const parsedBien: Bien | null = bien ? JSON.parse(bien as string) : null;
 
-  const handleGoBack = () => {
-    router.back();
-  };
-
   if (!parsedBien) {
     return (
       <Container>
@@ -25,14 +21,6 @@ export default function ItemDetail() {
 
   return (
     <Container>
-      {/* Header/Navbar */}
-      <View>
-        <TouchableOpacity onPress={handleGoBack}>
-          <Icon as={ArrowLeft} size="xl" color="#000" />
-        </TouchableOpacity>
-        <Text>Detalle del Bien</Text>
-      </View>
-
       {/* Content */}
       <View>
         <HStack>

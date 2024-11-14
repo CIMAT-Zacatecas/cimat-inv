@@ -1,10 +1,28 @@
 import { Text, TouchableOpacity } from "react-native";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableData } from "@/components/ui/table";
 import Container from "@/components/ui/container";
 import { useInventory } from "@/hooks/useInventory";
 import { Spinner } from "@/components/ui/spinner";
 import { router } from "expo-router";
 import { Bien } from "@/types/types";
+import { FlashList } from "@shopify/flash-list";
+import { Card } from "@/components/ui/card";
+import { HStack } from "@/components/ui/hstack";
+import { VStack } from "@/components/ui/vstack";
+import { Separator } from "@/components/ui/separator";
+
+const BienItem = ({ bien, onPress }: { bien: Bien; onPress: () => void }) => (
+  <TouchableOpacity onPress={onPress}>
+    <Card size="md" variant="elevated">
+      <VStack space="sm">
+        <HStack space="md">
+          <Text>ID: {bien.id_primario}</Text>
+          <Text>→</Text>
+        </HStack>
+        <Text>{bien.descripcion}</Text>
+      </VStack>
+    </Card>
+  </TouchableOpacity>
+);
 
 export default function Inventory() {
   const { data: bienes = [], isLoading, error } = useInventory();
@@ -43,31 +61,16 @@ export default function Inventory() {
   }
 
   return (
-    <Container>
-      <Text>Inventario</Text>
-
-      <Table className="w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Descripción</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {bienes.map((bien) => (
-            <TouchableOpacity key={bien.id_primario} onPress={() => handlePress(bien)}>
-              <TableRow>
-                <TableData>{bien.id_primario}</TableData>
-                <TableData>{bien.descripcion}</TableData>
-                <TableData>
-                  <Text>→</Text>
-                </TableData>
-              </TableRow>
-            </TouchableOpacity>
-          ))}
-        </TableBody>
-      </Table>
+    <Container removeVerticalPadding>
+      <FlashList
+        ListHeaderComponent={() => <Separator height={8} />}
+        estimatedItemSize={50}
+        data={bienes}
+        renderItem={({ item }) => <BienItem bien={item} onPress={() => handlePress(item)} />}
+        keyExtractor={(item) => item.id_primario.toString()}
+        contentContainerClassName="pb-5"
+        ItemSeparatorComponent={() => <Separator height={8} />}
+      />
     </Container>
   );
 }

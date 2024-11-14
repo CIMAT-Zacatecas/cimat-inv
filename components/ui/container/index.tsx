@@ -4,13 +4,33 @@ import { View, ViewProps, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaVi
 interface ContainerProps extends ViewProps {
   children: React.ReactNode;
   centered?: boolean;
+  removePadding?: boolean;
+  removeHorizontalPadding?: boolean;
+  removeVerticalPadding?: boolean;
 }
 
-const Container: React.FC<ContainerProps> = ({ children, style, centered, ...props }) => {
+const Container: React.FC<ContainerProps> = ({
+  children,
+  style,
+  centered,
+  removePadding,
+  removeHorizontalPadding,
+  removeVerticalPadding,
+  ...props
+}) => {
+  const containerStyle = [
+    styles.container,
+    centered && styles.centered,
+    removePadding && { padding: 0 },
+    removeHorizontalPadding && { paddingHorizontal: 0 },
+    removeVerticalPadding && { paddingVertical: 0 },
+    style,
+  ];
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-        <View style={[styles.container, centered && styles.centered, style]} {...props}>
+        <View style={containerStyle} {...props}>
           {children}
         </View>
       </KeyboardAvoidingView>

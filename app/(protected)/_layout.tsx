@@ -29,7 +29,8 @@ export default function ProtectedLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: "Home",
+          title: "Inicio",
+          headerShown: false,
           tabBarIcon: ({ color }) => <FontAwesome name="home" size={24} color={color} />,
         }}
       />
@@ -37,14 +38,15 @@ export default function ProtectedLayout() {
         name="inventory"
         options={{
           headerShown: false,
-          title: "Inventory",
+          title: "Inventario",
           tabBarIcon: ({ color }) => <FontAwesome name="list" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="my-profile"
         options={{
-          title: "Profile",
+          title: "Mi Perfil",
+          headerShown: false,
           tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
         }}
       />
@@ -52,6 +54,7 @@ export default function ProtectedLayout() {
         name="scanner"
         options={{
           title: "Scanner",
+          headerShown: false,
           tabBarIcon: ({ color }) => <FontAwesome name="qrcode" size={24} color={color} />,
           href: null,
         }}
@@ -60,7 +63,8 @@ export default function ProtectedLayout() {
         <Tabs.Screen
           name="users"
           options={{
-            title: "Users",
+            title: "Usuarios",
+            headerShown: false,
             tabBarIcon: ({ color }) => <FontAwesome name="shield" size={24} color={color} />,
           }}
         />

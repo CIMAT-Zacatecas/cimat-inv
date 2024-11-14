@@ -1,11 +1,29 @@
 import { useEffect, useState } from "react";
-import { TableHeader, TableRow, TableHead, TableBody, TableData, Table } from "@/components/ui/table";
 import { Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { Bien } from "@/types/types";
 import Container from "@/components/ui/container";
+import { FlashList } from "@shopify/flash-list";
+import { Card } from "@/components/ui/card";
+import { HStack } from "@/components/ui/hstack";
+import { VStack } from "@/components/ui/vstack";
+import { Separator } from "@/components/ui/separator";
+
+const BienItem = ({ bien, onPress }: { bien: Bien; onPress: () => void }) => (
+  <TouchableOpacity onPress={onPress}>
+    <Card size="md" variant="elevated">
+      <VStack space="sm">
+        <HStack space="md">
+          <Text>ID: {bien.id_primario}</Text>
+          <Text>→</Text>
+        </HStack>
+        <Text>{bien.descripcion}</Text>
+      </VStack>
+    </Card>
+  </TouchableOpacity>
+);
 
 export default function HomeScreen() {
   const user = useAuthUser();
@@ -77,31 +95,16 @@ export default function HomeScreen() {
   };
 
   return (
-    <Container>
-      <Text>Mis bienes</Text>
-
-      <Table className="w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Descripción</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {bienes.map((bien) => (
-            <TouchableOpacity key={bien.id_primario} onPress={() => handlePress(bien)}>
-              <TableRow>
-                <TableData>{bien.id_primario}</TableData>
-                <TableData>{bien.descripcion}</TableData>
-                <TableData>
-                  <Text>→</Text>
-                </TableData>
-              </TableRow>
-            </TouchableOpacity>
-          ))}
-        </TableBody>
-      </Table>
+    <Container removeVerticalPadding>
+      <Text className="mb-4 text-2xl font-bold">Mis bienes</Text>
+      <FlashList
+        estimatedItemSize={50}
+        data={bienes}
+        renderItem={({ item }) => <BienItem bien={item} onPress={() => handlePress(item)} />}
+        keyExtractor={(item) => item.id_primario.toString()}
+        contentContainerClassName="pb-5"
+        ItemSeparatorComponent={() => <Separator height={10} />}
+      />
     </Container>
   );
 }
