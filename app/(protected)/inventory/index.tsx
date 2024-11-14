@@ -66,7 +66,7 @@ export default function Inventory() {
 
   return (
     <Container removeVerticalPadding>
-      <Card className="my-4">
+      <Card className="mb-4 mt-4">
         <VStack space="md">
           <Input>
             <InputField

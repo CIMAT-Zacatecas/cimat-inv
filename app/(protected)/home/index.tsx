@@ -59,6 +59,7 @@ export default function HomeScreen() {
     <Container removeVerticalPadding>
       <Text className="mb-4 text-2xl font-bold">Mis bienes</Text>
       <FlashList
+        ListHeaderComponent={() => <Separator height={8} />}
         estimatedItemSize={50}
         data={bienes}
         renderItem={({ item }) => (

@@ -163,7 +163,7 @@ export default function CreateItem() {
   return (
     <Container removeVerticalPadding>
       <ScrollView>
-        <Card className="my-4">
+        <Card className="mb-4 mt-4">
           <VStack space="md">
             <FormControl isInvalid={!!errors.id_primario}>
               <FormControlLabel>
