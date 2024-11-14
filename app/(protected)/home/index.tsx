@@ -1,36 +1,15 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text } from "react-native";
 import { router } from "expo-router";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { Bien, BienWithRelations } from "@/types/types";
+import { BienWithRelations } from "@/types/types";
 import Container from "@/components/ui/container";
 import { FlashList } from "@shopify/flash-list";
-import { Card } from "@/components/ui/card";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { Separator } from "@/components/ui/separator";
 import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
 import { useUserInventory } from "@/hooks/useInventory";
 import { Spinner } from "@/components/ui/spinner";
-
-const BienItem = ({
-  bien,
-  onPress,
-}: {
-  bien: BienWithRelations;
-  onPress: () => void;
-}) => (
-  <TouchableOpacity onPress={onPress}>
-    <Card size="md" variant="elevated">
-      <VStack space="sm">
-        <HStack space="md">
-          <Text>ID: {bien.id_primario}</Text>
-          <Text>→</Text>
-        </HStack>
-        <Text>{bien.descripcion}</Text>
-      </VStack>
-    </Card>
-  </TouchableOpacity>
-);
+import React from "react";
+import BienItem from "@/components/bienItem";
 
 export default function HomeScreen() {
   const user = useAuthUser();
@@ -43,10 +22,10 @@ export default function HomeScreen() {
 
   useRefreshOnFocus(refetch);
 
-  const handlePress = (bien: Bien) => {
+  const handlePress = (bien: BienWithRelations) => {
     router.push({
       pathname: "/home/item-detail",
-      params: { bien: JSON.stringify(bien) },
+      params: { id: bien.id_primario },
     });
   };
 

@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text } from "react-native";
 import Container from "@/components/ui/container";
 import { useInventory } from "@/hooks/useInventory";
 import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
@@ -6,24 +6,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { router } from "expo-router";
 import { Bien } from "@/types/types";
 import { FlashList } from "@shopify/flash-list";
-import { Card } from "@/components/ui/card";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { Separator } from "@/components/ui/separator";
-
-const BienItem = ({ bien, onPress }: { bien: Bien; onPress: () => void }) => (
-  <TouchableOpacity onPress={onPress}>
-    <Card size="md" variant="elevated">
-      <VStack space="sm">
-        <HStack space="md">
-          <Text>ID: {bien.id_primario}</Text>
-          <Text>→</Text>
-        </HStack>
-        <Text>{bien.descripcion}</Text>
-      </VStack>
-    </Card>
-  </TouchableOpacity>
-);
+import BienItem from "@/components/bienItem";
 
 export default function Inventory() {
   const { data: bienes = [], isLoading, error, refetch } = useInventory();
