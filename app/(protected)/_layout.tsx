@@ -59,16 +59,15 @@ export default function ProtectedLayout() {
           href: null,
         }}
       />
-      {isAdmin && (
-        <Tabs.Screen
-          name="users"
-          options={{
-            title: "Usuarios",
-            headerShown: false,
-            tabBarIcon: ({ color }) => <FontAwesome name="shield" size={24} color={color} />,
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="users"
+        options={{
+          title: "Usuarios",
+          headerShown: false,
+          tabBarIcon: ({ color }) => <FontAwesome name="shield" size={24} color={color} />,
+          tabBarButton: isAdmin ? undefined : () => null,
+        }}
+      />
     </Tabs>
   );
 }
