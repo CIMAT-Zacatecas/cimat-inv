@@ -63,4 +63,25 @@ export const inventoryService = {
     if (error) throw error;
     return data;
   },
+
+  async createItem(data: BienInsert) {
+    const { data: result, error } = await supabase
+      .from("bienes")
+      .insert(data)
+      .select(
+        `
+        *,
+        categoria:categorias(*),
+        estado:estados_bienes(*),
+        ubicacion:ubicaciones(*),
+        sub_ubicacion:sub_ubicaciones(*),
+        responsable:profiles!bienes_id_responsable_fkey(*),
+        subresponsable:profiles!bienes_id_subresponsable_fkey(*)
+      `,
+      )
+      .single();
+
+    if (error) throw error;
+    return result;
+  },
 };
