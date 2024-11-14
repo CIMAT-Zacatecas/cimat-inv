@@ -3,7 +3,8 @@ import { Alert, Keyboard, Image, View } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useForm, Controller } from "react-hook-form";
-import EmailValidator from "@/lib/email-validator";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { VStack } from "@/components/ui/vstack";
 import Container from "@/components/ui/container";
@@ -20,11 +21,14 @@ import { AlertCircleIcon } from "@/components/ui/icon";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 
-const emailValidator = new EmailValidator();
+const formSchema = z.object({
+  email: z
+    .string()
+    .min(1, "El correo electrónico es obligatorio")
+    .email("Correo electrónico inválido"),
+});
 
-interface FormData {
-  email: string;
-}
+type FormData = z.infer<typeof formSchema>;
 
 export default function RestorePasswordScreen() {
   const router = useRouter();
@@ -34,6 +38,7 @@ export default function RestorePasswordScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
     },
@@ -49,11 +54,16 @@ export default function RestorePasswordScreen() {
 
       if (error) throw error;
 
-      Alert.alert("Correo enviado", "Se ha enviado un correo con instrucciones para restablecer tu contraseña.", [
-        { text: "OK", onPress: () => router.replace("/login") },
-      ]);
+      Alert.alert(
+        "Correo enviado",
+        "Se ha enviado un correo con instrucciones para restablecer tu contraseña.",
+        [{ text: "OK", onPress: () => router.replace("/login") }],
+      );
     } catch (error) {
-      Alert.alert("Error", error instanceof Error ? error.message : "An unknown error occurred");
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +77,12 @@ export default function RestorePasswordScreen() {
             source={require("@/assets/images/cimat.png")}
             style={{ height: 150, resizeMode: "contain", marginBottom: 8 }}
           />
-          <Text style={{ fontWeight: "600", marginBottom: 4 }}>Restablecer contraseña</Text>
-          <Text style={{ fontWeight: "300" }}>Ingresa tu correo electrónico para recibir instrucciones</Text>
+          <Text style={{ fontWeight: "600", marginBottom: 4 }}>
+            Restablecer contraseña
+          </Text>
+          <Text style={{ fontWeight: "300" }}>
+            Ingresa tu correo electrónico para recibir instrucciones
+          </Text>
         </View>
         <FormControl isInvalid={!!errors.email}>
           <FormControlLabel>
@@ -76,10 +90,6 @@ export default function RestorePasswordScreen() {
           </FormControlLabel>
           <Controller
             control={control}
-            rules={{
-              required: "El correo electrónico es obligatorio",
-              validate: (value) => emailValidator.validate(value) || "Correo electrónico inválido",
-            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
@@ -103,7 +113,10 @@ export default function RestorePasswordScreen() {
         <Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
           <ButtonText>{isLoading ? "Enviando..." : "Enviar instrucciones"}</ButtonText>
         </Button>
-        <Button variant="link" onPress={() => router.replace("/login")} isDisabled={isLoading}>
+        <Button
+          variant="link"
+          onPress={() => router.replace("/login")}
+          isDisabled={isLoading}>
           <ButtonText>Volver a inicio de sesión</ButtonText>
         </Button>
       </VStack>

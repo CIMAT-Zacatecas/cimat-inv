@@ -1,70 +1,78 @@
-import { Redirect } from "expo-router";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Tabs, Redirect } from "expo-router";
 import { useUserStore } from "@/store/userStore";
-import { Icon } from "@/components/ui/icon";
-import HomeScreen from ".";
-import MyProfile from "./my-profile";
-import AdminDashboard from "./admin-dashboard";
-import Scanner from "./scanner";
-import { ArrowLeftRight, CircleUser, Home, LayoutDashboard, QrCode, Users, Warehouse } from "lucide-react-native";
-import Transfers from "./transfers";
-import UsersManagement from "./users-management";
-import Inventory from "./inventory";
-
-const Tab = createBottomTabNavigator();
+import { ROLES } from "@/constants/Roles";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function ProtectedLayout() {
   const user = useUserStore((state) => state.user);
 
-  if (!user) {
-    // If the user is not logged in, redirect to the login screen
-    return <Redirect href="/login" />;
+  // If user state is still loading, show nothing
+  if (user === undefined) {
+    return null;
   }
 
-  const isAdmin = user.profile?.id_rol === 1;
+  // If not logged in, redirect to login
+  if (!user) {
+    return <Redirect href="/(auth)/login" />;
+  }
+
+  const isAdmin = user?.profile?.id_rol === ROLES.ADMIN;
 
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconComponent;
-
-          if (route.name === "Dashboard") {
-            iconComponent = LayoutDashboard;
-          } else if (route.name === "Inventario") {
-            iconComponent = Warehouse;
-          } else if (route.name === "QR") {
-            iconComponent = QrCode;
-          } else if (route.name === "Usuarios") {
-            iconComponent = Users;
-          } else if (route.name === "Transferencias") {
-            iconComponent = ArrowLeftRight;
-          } else if (route.name === "Mi Perfil") {
-            iconComponent = CircleUser;
-          } else if (route.name === "Inicio") {
-            iconComponent = Home;
-          }
-
-          return <Icon as={iconComponent} size="xl" />;
-        },
-        tabBarActiveTintColor: "#73243D",
-        tabBarInactiveTintColor: "gray",
-      })}>
-      {isAdmin ? (
-        <>
-          <Tab.Screen name="Dashboard" component={AdminDashboard} />
-          <Tab.Screen name="Inventario" component={Inventory} />
-          <Tab.Screen name="QR" component={Scanner} />
-          <Tab.Screen name="Usuarios" component={UsersManagement} />
-          <Tab.Screen name="Transferencias" component={Transfers} />
-        </>
-      ) : (
-        <>
-          <Tab.Screen name="Inicio" component={HomeScreen} />
-        </>
-      )}
-      <Tab.Screen name="Mi Perfil" component={MyProfile} />
-    </Tab.Navigator>
+    <Tabs>
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: "Inicio",
+          headerShown: false,
+          tabBarIcon: ({ color }) => <FontAwesome name="home" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="inventory"
+        options={{
+          headerShown: false,
+          title: "Inventario",
+          tabBarIcon: ({ color }) => <FontAwesome name="list" size={24} color={color} />,
+          tabBarButton: isAdmin ? undefined : () => null,
+        }}
+      />
+      <Tabs.Screen
+        name="my-profile"
+        options={{
+          title: "Mi Perfil",
+          headerShown: false,
+          tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="scanner"
+        options={{
+          title: "Scanner",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="qrcode" size={24} color={color} />
+          ),
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="users"
+        options={{
+          title: "Usuarios",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="shield" size={24} color={color} />
+          ),
+          tabBarButton: isAdmin ? undefined : () => null,
+        }}
+      />
+    </Tabs>
   );
 }

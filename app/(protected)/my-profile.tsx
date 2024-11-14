@@ -1,7 +1,11 @@
+import { Button, ButtonText } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import Container from "@/components/ui/container";
 import { supabase } from "@/lib/supabase";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "expo-router";
-import { View, Text, StyleSheet, Alert, Button } from "react-native";
+import { Alert } from "react-native";
+import { VStack } from "@/components/ui/vstack";
 
 export default function MyProfile() {
   const user = useUserStore((state) => state.user);
@@ -19,16 +23,14 @@ export default function MyProfile() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Mi perfil</Text>
-      <Text style={styles.title}>Hola, {user?.profile.full_name || user?.authUser.email}!</Text>
-      <Text>{user?.authUser.email}</Text>
-      <Button title="Logout" onPress={handleLogout} />
-    </View>
+    <Container centered>
+      <VStack space="lg" className="items-center">
+        <Text>Hola, {user?.profile.full_name || user?.authUser.email}!</Text>
+        <Text>{user?.authUser.email}</Text>
+        <Button onPress={handleLogout}>
+          <ButtonText>Logout</ButtonText>
+        </Button>
+      </VStack>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 24, marginBottom: 20 },
-});
