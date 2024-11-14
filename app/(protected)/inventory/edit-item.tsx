@@ -33,7 +33,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const updateItemSchema = z.object({
   id_primario: z.string().min(1, "El ID primario es obligatorio"),
@@ -61,7 +61,17 @@ export default function EditItem() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bienes")
-        .select("*")
+        .select(
+          `
+          *,
+          categoria:categorias(*),
+          estado:estados_bienes(*),
+          ubicacion:ubicaciones(*),
+          sub_ubicacion:sub_ubicaciones(*),
+          responsable:profiles!bienes_id_responsable_fkey(*),
+          subresponsable:profiles!bienes_id_subresponsable_fkey(*)
+        `,
+        )
         .eq("id_primario", id)
         .single();
 
@@ -141,7 +151,17 @@ export default function EditItem() {
     },
   });
 
-  // Set form values when item data is loaded
+  // Add state for selected values
+  const [selectedValues, setSelectedValues] = useState({
+    categoria: "",
+    estado: "",
+    ubicacion: "",
+    subUbicacion: "",
+    responsable: "",
+    subresponsable: "",
+  });
+
+  // Update the useEffect that sets form values to also set selected values
   useEffect(() => {
     if (item) {
       reset({
@@ -155,6 +175,16 @@ export default function EditItem() {
         id_sub_ubicacion: item.id_sub_ubicacion,
         id_responsable: item.id_responsable,
         id_subresponsable: item.id_subresponsable,
+      });
+
+      setSelectedValues({
+        categoria: item.categoria?.nombre || "",
+        estado: item.estado?.nombre || "",
+        ubicacion: item.ubicacion?.nombre || "",
+        subUbicacion: item.sub_ubicacion?.nombre || "",
+        responsable: item.responsable?.full_name || item.responsable?.username || "",
+        subresponsable:
+          item.subresponsable?.full_name || item.subresponsable?.username || "",
       });
     }
   }, [item, reset]);
@@ -308,9 +338,22 @@ export default function EditItem() {
                 render={({ field: { onChange, value } }) => (
                   <Select
                     selectedValue={value?.toString()}
-                    onValueChange={(val) => onChange(val ? Number(val) : null)}>
+                    onValueChange={(val) => {
+                      onChange(val ? Number(val) : null);
+                      const newCategory = categories.find((c) => c.id === Number(val));
+                      setSelectedValues((prev) => ({
+                        ...prev,
+                        categoria: newCategory?.nombre || "",
+                      }));
+                    }}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione una categoría" />
+                      <SelectInput
+                        placeholder="Seleccione una categoría"
+                        value={
+                          categories.find((c) => c.id === value)?.nombre ||
+                          selectedValues.categoria
+                        }
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -342,9 +385,22 @@ export default function EditItem() {
                 render={({ field: { onChange, value } }) => (
                   <Select
                     selectedValue={value?.toString()}
-                    onValueChange={(val) => onChange(val ? Number(val) : null)}>
+                    onValueChange={(val) => {
+                      onChange(val ? Number(val) : null);
+                      const newStatus = statuses.find((s) => s.id === Number(val));
+                      setSelectedValues((prev) => ({
+                        ...prev,
+                        estado: newStatus?.nombre || "",
+                      }));
+                    }}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione un estado" />
+                      <SelectInput
+                        placeholder="Seleccione un estado"
+                        value={
+                          statuses.find((s) => s.id === value)?.nombre ||
+                          selectedValues.estado
+                        }
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -378,11 +434,22 @@ export default function EditItem() {
                     selectedValue={value?.toString()}
                     onValueChange={(val) => {
                       onChange(val ? Number(val) : null);
-                      // Reset sub_ubicacion when ubicacion changes
+                      const newLocation = locations.find((l) => l.id === Number(val));
+                      setSelectedValues((prev) => ({
+                        ...prev,
+                        ubicacion: newLocation?.nombre || "",
+                        subUbicacion: "",
+                      }));
                       control._reset({ id_sub_ubicacion: null });
                     }}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione una ubicación" />
+                      <SelectInput
+                        placeholder="Seleccione una ubicación"
+                        value={
+                          locations.find((l) => l.id === value)?.nombre ||
+                          selectedValues.ubicacion
+                        }
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -415,9 +482,24 @@ export default function EditItem() {
                   render={({ field: { onChange, value } }) => (
                     <Select
                       selectedValue={value?.toString()}
-                      onValueChange={(val) => onChange(val ? Number(val) : null)}>
+                      onValueChange={(val) => {
+                        onChange(val ? Number(val) : null);
+                        const newSubLocation = subLocations.find(
+                          (s) => s.id === Number(val),
+                        );
+                        setSelectedValues((prev) => ({
+                          ...prev,
+                          subUbicacion: newSubLocation?.nombre || "",
+                        }));
+                      }}>
                       <SelectTrigger>
-                        <SelectInput placeholder="Seleccione una sub-ubicación" />
+                        <SelectInput
+                          placeholder="Seleccione una sub-ubicación"
+                          value={
+                            subLocations.find((s) => s.id === value)?.nombre ||
+                            selectedValues.subUbicacion
+                          }
+                        />
                       </SelectTrigger>
                       <SelectPortal>
                         <SelectBackdrop />
@@ -450,9 +532,22 @@ export default function EditItem() {
                 render={({ field: { onChange, value } }) => (
                   <Select
                     selectedValue={value?.toString()}
-                    onValueChange={(val) => onChange(val || null)}>
+                    onValueChange={(val) => {
+                      onChange(val || null);
+                      const newUser = users.find((u) => u.id === val);
+                      setSelectedValues((prev) => ({
+                        ...prev,
+                        responsable: newUser?.full_name || newUser?.username || "",
+                      }));
+                    }}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione un responsable" />
+                      <SelectInput
+                        placeholder="Seleccione un responsable"
+                        value={
+                          users.find((u) => u.id === value)?.full_name ||
+                          selectedValues.responsable
+                        }
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -486,7 +581,15 @@ export default function EditItem() {
                     selectedValue={value?.toString()}
                     onValueChange={(val) => onChange(val || null)}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione un sub-responsable" />
+                      <SelectInput
+                        placeholder="Seleccione un sub-responsable"
+                        value={
+                          selectedValues.subresponsable ||
+                          users.find((u) => u.id === value)?.full_name ||
+                          users.find((u) => u.id === value)?.username ||
+                          "No disponible"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
