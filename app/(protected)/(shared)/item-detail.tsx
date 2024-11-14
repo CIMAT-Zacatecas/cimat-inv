@@ -1,6 +1,4 @@
-// app/detail.js
-import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import Container from "@/components/ui/container";
 import { ArrowLeft } from "lucide-react-native";
@@ -9,7 +7,7 @@ import { TouchableOpacity } from "react-native";
 import { HStack } from "@/components/ui/hstack";
 import { Bien } from "@/types/types";
 
-export default function DetailScreen() {
+export default function ItemDetail() {
   const { bien } = useLocalSearchParams();
   const parsedBien: Bien | null = bien ? JSON.parse(bien as string) : null;
 

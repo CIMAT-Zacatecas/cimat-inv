@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from "expo-camera";
 import { useState } from "react";
 import Container from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Alert } from "react-native";
 
 export default function Scanner() {
@@ -22,7 +22,9 @@ export default function Scanner() {
     return (
       <Container centered>
         <Text>Se requiere acceso a la cámara para escanear códigos</Text>
-        <Button onPress={requestPermission}>Permitir acceso</Button>
+        <Button onPress={requestPermission}>
+          <ButtonText>Permitir acceso</ButtonText>
+        </Button>
       </Container>
     );
   }

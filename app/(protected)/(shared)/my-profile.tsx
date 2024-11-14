@@ -1,10 +1,9 @@
-import { Alert } from "react-native";
-import { Text } from "@/components/Themed";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 import { supabase } from "@/lib/supabase";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "expo-router";
+import { Alert, Text } from "react-native";
 
 export default function MyProfile() {
   const user = useUserStore((state) => state.user);
@@ -26,7 +25,9 @@ export default function MyProfile() {
       <Text>Mi perfil</Text>
       <Text>Hola, {user?.profile.full_name || user?.authUser.email}!</Text>
       <Text>{user?.authUser.email}</Text>
-      <Button onPress={handleLogout}>Logout</Button>
+      <Button onPress={handleLogout}>
+        <ButtonText>Logout</ButtonText>
+      </Button>
     </Container>
   );
 }

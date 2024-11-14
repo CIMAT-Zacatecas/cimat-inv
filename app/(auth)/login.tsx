@@ -3,7 +3,6 @@ import { Alert, Keyboard, Text, Image, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserStore } from "@/store/userStore";
 import { supabase } from "@/lib/supabase";
-
 import type { Profile } from "@/types/profile";
 import { useForm, Controller } from "react-hook-form";
 import LoadingOverlay from "@/components/ui/loading-overlay";

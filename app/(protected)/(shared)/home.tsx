@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { TableHeader, TableRow, TableHead, TableBody, TableData, Table } from "@/components/ui/table";
-import { Text, ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
+import { Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -13,35 +13,35 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchBienes = async () => {
-    try {
-      if (!user.profile?.id) {
-        setError("Usuario no identificado");
-        return;
-      }
-
-      const { data, error: supabaseError } = await supabase
-        .from("bienes")
-        .select("*")
-        .eq("id_responsable", user.profile.id);
-
-      if (supabaseError) {
-        setError("Error al obtener bienes");
-        console.error("Error al obtener bienes:", supabaseError);
-      } else {
-        setBienes(data || []);
-      }
-    } catch (err) {
-      setError("Error inesperado");
-      console.error("Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchBienes = async () => {
+      try {
+        if (!user.profile?.id) {
+          setError("Usuario no identificado");
+          return;
+        }
+
+        const { data, error: supabaseError } = await supabase
+          .from("bienes")
+          .select("*")
+          .eq("id_responsable", user.profile.id);
+
+        if (supabaseError) {
+          setError("Error al obtener bienes");
+          console.error("Error al obtener bienes:", supabaseError);
+        } else {
+          setBienes(data || []);
+        }
+      } catch (err) {
+        setError("Error inesperado");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchBienes();
-  }, [user.profile?.id]); // Add proper dependency
+  }, [user.profile?.id]);
 
   if (loading) {
     return (
