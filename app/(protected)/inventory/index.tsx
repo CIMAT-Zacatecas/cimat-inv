@@ -78,6 +78,7 @@ export default function Inventory() {
 
           <HStack space="sm">
             <Select
+              className="flex-1"
               selectedValue={filters.categoryId?.toString()}
               onValueChange={(value) =>
                 setFilters((prev) => ({
@@ -107,6 +108,7 @@ export default function Inventory() {
             </Select>
 
             <Select
+              className="flex-1"
               selectedValue={filters.statusId?.toString()}
               onValueChange={(value) =>
                 setFilters((prev) => ({
@@ -136,6 +138,7 @@ export default function Inventory() {
             </Select>
 
             <Select
+              className="flex-1"
               selectedValue={filters.locationId?.toString()}
               onValueChange={(value) =>
                 setFilters((prev) => ({
