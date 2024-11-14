@@ -1,8 +1,8 @@
 export interface Profile {
   id: string;
-  updated_at: string | undefined;
-  username: string | undefined;
-  full_name: string | undefined;
-  avatar_url: string | undefined;
-  id_rol: int;
+  updated_at: string | null;
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  id_rol: number;
 }

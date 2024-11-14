@@ -1,33 +1,67 @@
 // app/detail.js
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { UseSearch } from "expo-router";
+import { Text, View, StyleSheet } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
+import Container from "@/components/ui/container";
+import { ArrowLeft } from "lucide-react-native";
+import { Icon } from "@/components/ui/icon";
+import { TouchableOpacity } from "react-native";
+import { HStack } from "@/components/ui/hstack";
+import { Bien } from "@/types/types";
 
 export default function DetailScreen() {
-  const { bien } = SearchParams();
-  const parsedBien = bien ? JSON.parse(bien) : null;
+  const { bien } = useLocalSearchParams();
+  const parsedBien: Bien | null = bien ? JSON.parse(bien as string) : null;
+
+  const handleGoBack = () => {
+    router.back();
+  };
 
   if (!parsedBien) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>No se proporcionaron detalles del bien.</Text>
-      </View>
+      <Container>
+        <Text>No se proporcionaron detalles del bien.</Text>
+      </Container>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Detalle del Bien</Text>
-      <Text style={styles.label}>ID: {parsedBien.id_primario}</Text>
-      <Text style={styles.label}>Descripción: {parsedBien.descripcion}</Text>
-      {/* Agrega más campos según sea necesario */}
-    </View>
+    <Container>
+      {/* Header/Navbar */}
+      <View>
+        <TouchableOpacity onPress={handleGoBack}>
+          <Icon as={ArrowLeft} size="xl" color="#000" />
+        </TouchableOpacity>
+        <Text>Detalle del Bien</Text>
+      </View>
+
+      {/* Content */}
+      <View>
+        <HStack>
+          <Text>ID Primario:</Text>
+          <Text>{parsedBien.id_primario}</Text>
+        </HStack>
+
+        <HStack>
+          <Text>Descripción:</Text>
+          <Text>{parsedBien.descripcion}</Text>
+        </HStack>
+
+        {/* Add more details if available in your data */}
+        {parsedBien.id_ubicacion && (
+          <HStack>
+            <Text>Ubicación:</Text>
+            <Text>{parsedBien.id_ubicacion}</Text>
+          </HStack>
+        )}
+
+        {parsedBien.id_estado && (
+          <HStack>
+            <Text>Estado:</Text>
+            <Text>{parsedBien.id_estado}</Text>
+          </HStack>
+        )}
+      </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
-  label: { fontSize: 18, marginBottom: 10 },
-  errorText: { fontSize: 18, color: "red", textAlign: "center" },
-});

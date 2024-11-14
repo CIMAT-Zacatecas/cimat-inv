@@ -1,70 +1,93 @@
-import { Redirect } from "expo-router";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useUserStore } from "@/store/userStore";
+import { Redirect, Tabs } from "expo-router";
 import { Icon } from "@/components/ui/icon";
-import HomeScreen from ".";
-import MyProfile from "./my-profile";
-import AdminDashboard from "./admin-dashboard";
-import Scanner from "./scanner";
-import { ArrowLeftRight, CircleUser, Home, LayoutDashboard, QrCode, Users, Warehouse } from "lucide-react-native";
-import Transfers from "./transfers";
-import UsersManagement from "./users-management";
-import Inventory from "./inventory";
-
-const Tab = createBottomTabNavigator();
+import { useUserStore } from "@/store/userStore";
+import {
+  Home,
+  Warehouse,
+  QrCode,
+  Users,
+  ArrowLeftRight,
+  CircleUser,
+  LayoutDashboard,
+} from "lucide-react-native";
+import { Platform } from "react-native";
+import { ROLES } from "@/constants/Roles";
 
 export default function ProtectedLayout() {
   const user = useUserStore((state) => state.user);
+  const isAdmin = user?.profile?.id_rol === ROLES.ADMIN;
 
   if (!user) {
-    // If the user is not logged in, redirect to the login screen
     return <Redirect href="/login" />;
   }
 
-  const isAdmin = user.profile?.id_rol === 1;
-
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
+    <Tabs
+      screenOptions={{
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconComponent;
-
-          if (route.name === "Dashboard") {
-            iconComponent = LayoutDashboard;
-          } else if (route.name === "Inventario") {
-            iconComponent = Warehouse;
-          } else if (route.name === "QR") {
-            iconComponent = QrCode;
-          } else if (route.name === "Usuarios") {
-            iconComponent = Users;
-          } else if (route.name === "Transferencias") {
-            iconComponent = ArrowLeftRight;
-          } else if (route.name === "Mi Perfil") {
-            iconComponent = CircleUser;
-          } else if (route.name === "Inicio") {
-            iconComponent = Home;
-          }
-
-          return <Icon as={iconComponent} size="xl" />;
-        },
         tabBarActiveTintColor: "#73243D",
         tabBarInactiveTintColor: "gray",
-      })}>
+        tabBarStyle: {
+          paddingVertical: Platform.OS === "ios" ? 20 : 0,
+        },
+      }}>
+      {/* Admin Routes */}
       {isAdmin ? (
         <>
-          <Tab.Screen name="Dashboard" component={AdminDashboard} />
-          <Tab.Screen name="Inventario" component={Inventory} />
-          <Tab.Screen name="QR" component={Scanner} />
-          <Tab.Screen name="Usuarios" component={UsersManagement} />
-          <Tab.Screen name="Transferencias" component={Transfers} />
+          <Tabs.Screen
+            name="admin-dashboard/index"
+            options={{
+              title: "Dashboard",
+              tabBarIcon: ({ color }) => <Icon as={LayoutDashboard} size="xl" color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="inventory/index"
+            options={{
+              title: "Inventario",
+              tabBarIcon: ({ color }) => <Icon as={Warehouse} size="xl" color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="scanner/index"
+            options={{
+              title: "QR",
+              tabBarIcon: ({ color }) => <Icon as={QrCode} size="xl" color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="users-management/index"
+            options={{
+              title: "Usuarios",
+              tabBarIcon: ({ color }) => <Icon as={Users} size="xl" color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="transfers/index"
+            options={{
+              title: "Transferencias",
+              tabBarIcon: ({ color }) => <Icon as={ArrowLeftRight} size="xl" color={color} />,
+            }}
+          />
         </>
       ) : (
-        <>
-          <Tab.Screen name="Inicio" component={HomeScreen} />
-        </>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Inicio",
+            tabBarIcon: ({ color }) => <Icon as={Home} size="xl" color={color} />,
+          }}
+        />
       )}
-      <Tab.Screen name="Mi Perfil" component={MyProfile} />
-    </Tab.Navigator>
+
+      {/* Common Route */}
+      <Tabs.Screen
+        name="my-profile"
+        options={{
+          title: "Mi Perfil",
+          tabBarIcon: ({ color }) => <Icon as={CircleUser} size="xl" color={color} />,
+        }}
+      />
+    </Tabs>
   );
 }

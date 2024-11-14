@@ -1,14 +1,10 @@
-import { View, Text, StyleSheet } from "react-native";
+import Container from "@/components/ui/container";
+import { Text } from "@/components/Themed";
 
 export default function Transfers() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Transferencias</Text>
-    </View>
+    <Container>
+      <Text>Transferencias</Text>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 24, marginBottom: 20 },
-});

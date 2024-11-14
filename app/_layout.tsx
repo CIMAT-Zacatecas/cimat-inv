@@ -50,7 +50,11 @@ export default function RootLayout() {
   // Check for existing session on app startup
   useEffect(() => {
     const fetchAndSetUser = async (authUser: SupabaseAuthUser) => {
-      const { data: profileData, error } = await supabase.from("profiles").select("*").eq("id", authUser.id).single();
+      const { data: profileData, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authUser.id)
+        .single();
 
       if (error) {
         console.error("Error fetching profile:", error.message);
@@ -58,6 +62,7 @@ export default function RootLayout() {
       }
 
       const user = { authUser, profile: profileData };
+
       setUser(user);
     };
 
@@ -103,7 +108,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <GluestackUIProvider mode="light">
+    <GluestackUIProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Slot />
       </ThemeProvider>

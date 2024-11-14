@@ -1,23 +1,29 @@
-import { View, Text, StyleSheet, Button, TouchableOpacity } from "react-native";
-import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import { View, Text, TouchableOpacity } from "react-native";
+import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from "expo-camera";
 import { useState } from "react";
+import Container from "@/components/ui/container";
+import { Button } from "@/components/ui/button";
+import { Alert } from "react-native";
 
 export default function Scanner() {
   const [facing, setFacing] = useState<CameraType>("back");
+  const [isScanning, setIsScanning] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
 
   if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
+    return (
+      <Container centered>
+        <Text>Cargando permisos de cámara...</Text>
+      </Container>
+    );
   }
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet.
     return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
+      <Container centered>
+        <Text>Se requiere acceso a la cámara para escanear códigos</Text>
+        <Button onPress={requestPermission}>Permitir acceso</Button>
+      </Container>
     );
   }
 
@@ -25,56 +31,32 @@ export default function Scanner() {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
+  const handleBarCodeScanned = ({ type, data }: BarcodeScanningResult) => {
+    setIsScanning(true);
+    try {
+      Alert.alert("Código escaneado", `Tipo: ${type}\nDatos: ${data}`);
+    } catch (error) {
+      Alert.alert("Error", "No se pudo procesar el código escaneado");
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
+    <Container>
+      <CameraView
+        facing={facing}
+        onBarcodeScanned={isScanning ? undefined : handleBarCodeScanned}
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr", "ean13"],
+        }}
+        style={{ flex: 1 }}>
+        <View>
+          <TouchableOpacity onPress={toggleCameraFacing}>
+            <Text>Cambiar cámara</Text>
           </TouchableOpacity>
         </View>
       </CameraView>
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  message: {
-    textAlign: "center",
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-});
-// return (
-//   <View style={styles.container}>
-//     <Text style={styles.title}>QR/Barras</Text>
-//   </View>
-// );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, justifyContent: "center", alignItems: "center" },
-//   title: { fontSize: 24, marginBottom: 20 },
-// });

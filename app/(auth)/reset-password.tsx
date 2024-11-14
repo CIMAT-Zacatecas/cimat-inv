@@ -18,11 +18,23 @@ import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
 import { AlertCircleIcon, EyeIcon, EyeOffIcon } from "@/components/ui/icon";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface FormData {
-  newPassword: string;
-  confirmPassword: string;
-}
+const resetPasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(6, "La contraseña debe tener al menos 6 caracteres")
+      .min(1, "La nueva contraseña es obligatoria"),
+    confirmPassword: z.string().min(1, "Debes confirmar la nueva contraseña"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
+type FormData = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
@@ -37,6 +49,7 @@ export default function ResetPasswordScreen() {
     formState: { errors },
     watch,
   } = useForm<FormData>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       newPassword: "",
       confirmPassword: "",
@@ -89,13 +102,6 @@ export default function ResetPasswordScreen() {
           </FormControlLabel>
           <Controller
             control={control}
-            rules={{
-              required: "La nueva contraseña es obligatoria",
-              minLength: {
-                value: 6,
-                message: "La contraseña debe tener al menos 6 caracteres",
-              },
-            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
@@ -124,10 +130,6 @@ export default function ResetPasswordScreen() {
           </FormControlLabel>
           <Controller
             control={control}
-            rules={{
-              required: "Debes confirmar la nueva contraseña",
-              validate: (value) => value === newPassword || "Las contraseñas no coinciden",
-            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField

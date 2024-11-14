@@ -1,27 +1,38 @@
-import { TableHeader, TableRow, TableHead, TableBody, TableData } from "@/components/ui/table";
-import { Table } from "@expo/html-elements";
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
+import { useEffect, useState } from "react";
+import { TableHeader, TableRow, TableHead, TableBody, TableData, Table } from "@/components/ui/table";
+import { Text, ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import { supabase } from "@/lib/supabase";
-import { useUserStore } from "@/store/userStore";
-import { router, useRouter } from "expo-router";
+import { router } from "expo-router";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { Bien } from "@/types/types";
+import Container from "@/components/ui/container";
 
 export default function HomeScreen() {
-  const user = useUserStore((state) => state.user);
-
-  const [bienes, setBienes] = useState([]);
+  const user = useAuthUser();
+  const [bienes, setBienes] = useState<Bien[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchBienes = async () => {
     try {
-      const { data, error } = await supabase.from("bienes").select("*").eq("id_responsable", user.profile?.id);
+      if (!user.profile?.id) {
+        setError("Usuario no identificado");
+        return;
+      }
 
-      if (error) {
-        console.error("Error al obtener bienes:", error);
+      const { data, error: supabaseError } = await supabase
+        .from("bienes")
+        .select("*")
+        .eq("id_responsable", user.profile.id);
+
+      if (supabaseError) {
+        setError("Error al obtener bienes");
+        console.error("Error al obtener bienes:", supabaseError);
       } else {
-        setBienes(data);
+        setBienes(data || []);
       }
     } catch (err) {
+      setError("Error inesperado");
       console.error("Error:", err);
     } finally {
       setLoading(false);
@@ -30,74 +41,67 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchBienes();
-  }, []);
+  }, [user.profile?.id]); // Add proper dependency
 
   if (loading) {
     return (
-      <View>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <Container centered>
+        <ActivityIndicator size="large" />
         <Text>Cargando inventario...</Text>
-      </View>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container centered>
+        <Text>{error}</Text>
+      </Container>
     );
   }
 
   if (bienes.length === 0) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Mi Inventario</Text>
+      <Container centered>
+        <Text>Mi Inventario</Text>
         <Text>No tienes bienes asignados.</Text>
-      </View>
+      </Container>
     );
   }
 
-  const handlePress = (bien) => {
+  const handlePress = (bien: Bien) => {
     router.push({
       pathname: "/(protected)/item-detail",
-      params: { bien: JSON.stringify(bien) }, // Pasamos el bien como string
+      params: { bien: JSON.stringify(bien) },
     });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Mis bienes</Text>
+    <Container>
+      <Text>Mis bienes</Text>
 
-      <ScrollView horizontal={true}>
-        <Table className="w-full">
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Descripción</TableHead>
-              <TableHead>Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {bienes.map((bien) => (
-              <TableRow key={bien.id_primario}>
+      <Table className="w-full">
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Descripción</TableHead>
+            <TableHead>Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {bienes.map((bien) => (
+            <TouchableOpacity key={bien.id_primario} onPress={() => handlePress(bien)}>
+              <TableRow>
                 <TableData>{bien.id_primario}</TableData>
                 <TableData>{bien.descripcion}</TableData>
                 <TableData>
-                  <TouchableOpacity style={styles.button} onPress={() => handlePress(bien)}>
-                    <Text style={styles.buttonText}>Ver Detalle</Text>
-                  </TouchableOpacity>
+                  <Text>→</Text>
                 </TableData>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </ScrollView>
-    </View>
+            </TouchableOpacity>
+          ))}
+        </TableBody>
+      </Table>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
-  table: { minWidth: 600 }, // Ajusta el ancho según tus necesidades
-  button: {
-    backgroundColor: "#007BFF",
-    padding: 5,
-    borderRadius: 5,
-  },
-  buttonText: { color: "#fff", textAlign: "center" },
-});

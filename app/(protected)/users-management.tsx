@@ -1,14 +1,10 @@
-import { View, Text, StyleSheet } from "react-native";
+import Container from "@/components/ui/container";
+import { Text } from "@/components/Themed";
 
 export default function UsersManagement() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Usuarios</Text>
-    </View>
+    <Container>
+      <Text>Usuarios</Text>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 24, marginBottom: 20 },
-});

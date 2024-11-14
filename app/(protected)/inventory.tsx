@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableData } from "@/components/ui/table";
+import { Bien } from "@/types/types";
+import Container from "@/components/ui/container";
 
 export default function Inventory() {
-  const [bienes, setBienes] = useState([]);
+  const [bienes, setBienes] = useState<Bien[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchBienes = async () => {
@@ -38,16 +40,16 @@ export default function Inventory() {
 
   if (bienes.length === 0) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Inventario</Text>
+      <Container>
+        <Text>Inventario</Text>
         <Text>No hay bienes disponibles.</Text>
-      </View>
+      </Container>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Inventario</Text>
+    <Container>
+      <Text>Inventario</Text>
 
       <ScrollView horizontal={true}>
         <Table className="w-full">
@@ -67,11 +69,6 @@ export default function Inventory() {
           </TableBody>
         </Table>
       </ScrollView>
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "flex-start", alignItems: "center" },
-  title: { fontSize: 24, marginBottom: 20 },
-});
