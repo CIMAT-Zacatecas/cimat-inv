@@ -17,3 +17,13 @@ export type Ubicacion = Database["public"]["Tables"]["ubicaciones"]["Row"];
 export type SubUbicacion = Database["public"]["Tables"]["sub_ubicaciones"]["Row"];
 export type Rol = Database["public"]["Tables"]["roles"]["Row"];
 export type Transferencia = Database["public"]["Tables"]["transferencias"]["Row"];
+
+// Add this after the existing types
+export type BienWithRelations = Bien & {
+  categoria: Categoria | null;
+  estado: EstadoBien | null;
+  ubicacion: Ubicacion | null;
+  sub_ubicacion: SubUbicacion | null;
+  responsable: Profile | null;
+  subresponsable: Profile | null;
+};

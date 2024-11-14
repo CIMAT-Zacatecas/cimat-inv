@@ -33,7 +33,7 @@ export default function Inventory() {
   const handlePress = (bien: Bien) => {
     router.push({
       pathname: "/inventory/item-detail",
-      params: { bien: JSON.stringify(bien) },
+      params: { id: bien.id_primario },
     });
   };
 

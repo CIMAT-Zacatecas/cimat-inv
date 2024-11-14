@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { Bien } from "@/types/types";
+import { Bien, BienWithRelations } from "@/types/types";
 import Container from "@/components/ui/container";
 import { FlashList } from "@shopify/flash-list";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,13 @@ import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
 import { useUserInventory } from "@/hooks/useInventory";
 import { Spinner } from "@/components/ui/spinner";
 
-const BienItem = ({ bien, onPress }: { bien: Bien; onPress: () => void }) => (
+const BienItem = ({
+  bien,
+  onPress,
+}: {
+  bien: BienWithRelations;
+  onPress: () => void;
+}) => (
   <TouchableOpacity onPress={onPress}>
     <Card size="md" variant="elevated">
       <VStack space="sm">
