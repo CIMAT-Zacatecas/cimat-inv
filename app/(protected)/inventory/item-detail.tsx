@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import Container from "@/components/ui/container";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
@@ -6,10 +6,22 @@ import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useInventoryItem } from "@/hooks/useInventory";
 import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react-native";
+import { useItemOperations } from "@/hooks/useInventoryOperations";
 
 export default function ItemDetail() {
   const { id } = useLocalSearchParams();
   const { data: bien, isLoading, error } = useInventoryItem(id as string);
+  const { deleteItem } = useItemOperations();
+
+  const handleEdit = () => {
+    router.push(`/inventory/edit-item?id=${id}`);
+  };
+
+  const handleDelete = () => {
+    deleteItem(id as string);
+  };
 
   if (isLoading) {
     return (
@@ -32,9 +44,30 @@ export default function ItemDetail() {
     <Container>
       <Card>
         <VStack space="md">
+          <HStack space="md" className="items-center justify-between">
+            <HStack space="md" className="flex-1">
+              <Text className="text-typography-900" bold>
+                ID:
+              </Text>
+              <Text>{bien.id}</Text>
+            </HStack>
+            <HStack space="sm">
+              <Button size="sm" variant="outline" action="secondary" onPress={handleEdit}>
+                <Pencil size={18} color="#666666" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                action="negative"
+                onPress={handleDelete}>
+                <Trash2 size={18} color="#dc2626" />
+              </Button>
+            </HStack>
+          </HStack>
+
           <HStack space="md">
             <Text className="text-typography-900" bold>
-              ID Primario:
+              ID CIMAT:
             </Text>
             <Text>{bien.id_primario}</Text>
           </HStack>
@@ -42,7 +75,7 @@ export default function ItemDetail() {
           {bien.id_secundario && (
             <HStack space="md">
               <Text className="text-typography-900" bold>
-                ID Secundario:
+                ID CIMAT 2:
               </Text>
               <Text>{bien.id_secundario}</Text>
             </HStack>

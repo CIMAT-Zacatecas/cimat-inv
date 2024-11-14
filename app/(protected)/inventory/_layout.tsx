@@ -31,6 +31,12 @@ export default function InventoryLayout() {
           title: "Crear Item",
         }}
       />
+      <Stack.Screen
+        name="edit-item"
+        options={{
+          title: "Editar Item",
+        }}
+      />
     </Stack>
   );
 }
