@@ -71,7 +71,7 @@ export default function HomeScreen() {
 
   const handlePress = (bien: Bien) => {
     router.push({
-      pathname: "/(protected)/item-detail",
+      pathname: "/(protected)/inventory/item-detail",
       params: { bien: JSON.stringify(bien) },
     });
   };

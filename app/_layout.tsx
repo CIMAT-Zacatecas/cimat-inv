@@ -7,6 +7,7 @@ import { useFonts } from "expo-font";
 import { router, Slot, SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import { supabase } from "../lib/supabase";
@@ -20,6 +21,16 @@ export const unstable_settings = {
 };
 
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 1000 * 60, // 1 minute
+      gcTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
 export default function RootLayout() {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -99,10 +110,12 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider mode="system">
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Slot />
-      </ThemeProvider>
-    </GluestackUIProvider>
+    <QueryClientProvider client={queryClient}>
+      <GluestackUIProvider mode="system">
+        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+          <Slot />
+        </ThemeProvider>
+      </GluestackUIProvider>
+    </QueryClientProvider>
   );
 }

@@ -5,5 +5,5 @@ export default function InitalRouting() {
 
   if (!rootNavigationState?.key) return null;
 
-  return <Redirect href="/(protected)/(user)/home" />;
+  return <Redirect href="/(protected)/home" />;
 }
