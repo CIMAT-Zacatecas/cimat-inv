@@ -23,7 +23,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const loginSchema = z.object({
-  email: z.string().min(1, "El correo electrónico es obligatorio").email("Correo electrónico inválido"),
+  email: z
+    .string()
+    .min(1, "El correo electrónico es obligatorio")
+    .email("Correo electrónico inválido"),
   password: z
     .string()
     .min(1, "La contraseña es obligatoria")
@@ -55,10 +58,12 @@ export default function LoginScreen() {
     setIsLoading(true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword(
+        {
+          email: data.email,
+          password: data.password,
+        },
+      );
 
       if (authError) throw authError;
 
@@ -76,7 +81,10 @@ export default function LoginScreen() {
 
       router.replace("/");
     } catch (error) {
-      Alert.alert("Error", error instanceof Error ? error.message : "An unknown error occurred");
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +102,9 @@ export default function LoginScreen() {
             source={require("@/assets/images/cimat.png")}
             style={{ height: 100, resizeMode: "contain", marginBottom: 10 }}
           />
-          <Text style={{ fontWeight: "600", marginBottom: 4 }}>Sistema de gestión de inventario</Text>
+          <Text style={{ fontWeight: "600", marginBottom: 4 }}>
+            Sistema de gestión de inventario
+          </Text>
           {/* <Text style={{ fontWeight: "300" }}>Ingresa tus datos para iniciar sesión</Text> */}
         </View>
 
@@ -156,7 +166,10 @@ export default function LoginScreen() {
           <ButtonText>{isLoading ? "Iniciando sesión..." : "Iniciar sesión"}</ButtonText>
         </Button>
 
-        <Button variant="link" onPress={() => router.replace("/restore-password")} isDisabled={isLoading}>
+        <Button
+          variant="link"
+          onPress={() => router.replace("/restore-password")}
+          isDisabled={isLoading}>
           <ButtonText>Restablecer contraseña</ButtonText>
         </Button>
       </VStack>

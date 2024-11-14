@@ -1,9 +1,6 @@
 import { Text, View } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import Container from "@/components/ui/container";
-import { ArrowLeft } from "lucide-react-native";
-import { Icon } from "@/components/ui/icon";
-import { TouchableOpacity } from "react-native";
 import { HStack } from "@/components/ui/hstack";
 import { Bien } from "@/types/types";
 

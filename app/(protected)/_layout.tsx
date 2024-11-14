@@ -40,6 +40,7 @@ export default function ProtectedLayout() {
           headerShown: false,
           title: "Inventario",
           tabBarIcon: ({ color }) => <FontAwesome name="list" size={24} color={color} />,
+          tabBarButton: isAdmin ? undefined : () => null,
         }}
       />
       <Tabs.Screen
@@ -55,7 +56,9 @@ export default function ProtectedLayout() {
         options={{
           title: "Scanner",
           headerShown: false,
-          tabBarIcon: ({ color }) => <FontAwesome name="qrcode" size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="qrcode" size={24} color={color} />
+          ),
           href: null,
         }}
       />
@@ -64,7 +67,9 @@ export default function ProtectedLayout() {
         options={{
           title: "Usuarios",
           headerShown: false,
-          tabBarIcon: ({ color }) => <FontAwesome name="shield" size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="shield" size={24} color={color} />
+          ),
           tabBarButton: isAdmin ? undefined : () => null,
         }}
       />

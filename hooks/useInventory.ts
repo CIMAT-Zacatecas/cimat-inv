@@ -9,10 +9,18 @@ export function useInventory() {
   });
 }
 
-export function useUserInventory(userId: string) {
+export function useUserInventory(userId?: string) {
   return useQuery<Bien[]>({
-    queryKey: ["inventory", userId],
-    queryFn: () => inventoryService.getByUserId(userId),
+    queryKey: ["inventory", "user", userId],
+    queryFn: () => inventoryService.getByUserId(userId!),
     enabled: !!userId,
+  });
+}
+
+export function useInventoryItem(id?: string) {
+  return useQuery<Bien>({
+    queryKey: ["inventory", "item", id],
+    queryFn: () => inventoryService.getById(id!),
+    enabled: !!id,
   });
 }

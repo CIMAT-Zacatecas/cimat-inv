@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { Text, ActivityIndicator, TouchableOpacity } from "react-native";
-import { supabase } from "@/lib/supabase";
+import { Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { Bien } from "@/types/types";
@@ -10,6 +8,9 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { Separator } from "@/components/ui/separator";
+import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
+import { useUserInventory } from "@/hooks/useInventory";
+import { Spinner } from "@/components/ui/spinner";
 
 const BienItem = ({ bien, onPress }: { bien: Bien; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress}>
@@ -27,44 +28,26 @@ const BienItem = ({ bien, onPress }: { bien: Bien; onPress: () => void }) => (
 
 export default function HomeScreen() {
   const user = useAuthUser();
-  const [bienes, setBienes] = useState<Bien[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: bienes = [],
+    isLoading,
+    error,
+    refetch,
+  } = useUserInventory(user.profile?.id);
 
-  useEffect(() => {
-    const fetchBienes = async () => {
-      try {
-        if (!user.profile?.id) {
-          setError("Usuario no identificado");
-          return;
-        }
+  useRefreshOnFocus(refetch);
 
-        const { data, error: supabaseError } = await supabase
-          .from("bienes")
-          .select("*")
-          .eq("id_responsable", user.profile.id);
+  const handlePress = (bien: Bien) => {
+    router.push({
+      pathname: "/home/item-detail",
+      params: { bien: JSON.stringify(bien) },
+    });
+  };
 
-        if (supabaseError) {
-          setError("Error al obtener bienes");
-          console.error("Error al obtener bienes:", supabaseError);
-        } else {
-          setBienes(data || []);
-        }
-      } catch (err) {
-        setError("Error inesperado");
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBienes();
-  }, [user.profile?.id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Container centered>
-        <ActivityIndicator size="large" />
+        <Spinner size="large" />
         <Text>Cargando inventario...</Text>
       </Container>
     );
@@ -73,7 +56,7 @@ export default function HomeScreen() {
   if (error) {
     return (
       <Container centered>
-        <Text>{error}</Text>
+        <Text>Error al cargar el inventario</Text>
       </Container>
     );
   }
@@ -87,20 +70,15 @@ export default function HomeScreen() {
     );
   }
 
-  const handlePress = (bien: Bien) => {
-    router.push({
-      pathname: "/home/item-detail",
-      params: { bien: JSON.stringify(bien) },
-    });
-  };
-
   return (
     <Container removeVerticalPadding>
       <Text className="mb-4 text-2xl font-bold">Mis bienes</Text>
       <FlashList
         estimatedItemSize={50}
         data={bienes}
-        renderItem={({ item }) => <BienItem bien={item} onPress={() => handlePress(item)} />}
+        renderItem={({ item }) => (
+          <BienItem bien={item} onPress={() => handlePress(item)} />
+        )}
         keyExtractor={(item) => item.id_primario.toString()}
         contentContainerClassName="pb-5"
         ItemSeparatorComponent={() => <Separator height={10} />}

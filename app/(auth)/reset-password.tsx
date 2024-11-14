@@ -73,14 +73,18 @@ export default function ResetPasswordScreen() {
         { text: "OK", onPress: () => router.replace("/login") },
       ]);
     } catch (error) {
-      Alert.alert("Error", error instanceof Error ? error.message : "An unknown error occurred");
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword);
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword(!showConfirmPassword);
 
   if (!token) return null;
 
@@ -92,7 +96,9 @@ export default function ResetPasswordScreen() {
             source={require("@/assets/images/cimat.png")}
             style={{ height: 150, resizeMode: "contain", marginBottom: 8 }}
           />
-          <Text style={{ fontWeight: "600", marginBottom: 4 }}>Restablecer contraseña</Text>
+          <Text style={{ fontWeight: "600", marginBottom: 4 }}>
+            Restablecer contraseña
+          </Text>
           <Text style={{ fontWeight: "300" }}>Ingresa tu nueva contraseña</Text>
         </View>
 
@@ -153,7 +159,9 @@ export default function ResetPasswordScreen() {
         </FormControl>
 
         <Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
-          <ButtonText>{isLoading ? "Actualizando..." : "Actualizar contraseña"}</ButtonText>
+          <ButtonText>
+            {isLoading ? "Actualizando..." : "Actualizar contraseña"}
+          </ButtonText>
         </Button>
       </VStack>
       <LoadingOverlay isLoading={isLoading} />

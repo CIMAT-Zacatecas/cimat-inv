@@ -1,7 +1,4 @@
 import { Stack } from "expo-router";
-import { TouchableOpacity } from "react-native";
-import { router } from "expo-router";
-import { Plus } from "lucide-react-native";
 
 export default function InventoryLayout() {
   return (

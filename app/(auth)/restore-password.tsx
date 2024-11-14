@@ -22,7 +22,10 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 
 const formSchema = z.object({
-  email: z.string().min(1, "El correo electrónico es obligatorio").email("Correo electrónico inválido"),
+  email: z
+    .string()
+    .min(1, "El correo electrónico es obligatorio")
+    .email("Correo electrónico inválido"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -57,7 +60,10 @@ export default function RestorePasswordScreen() {
         [{ text: "OK", onPress: () => router.replace("/login") }],
       );
     } catch (error) {
-      Alert.alert("Error", error instanceof Error ? error.message : "An unknown error occurred");
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -71,8 +77,12 @@ export default function RestorePasswordScreen() {
             source={require("@/assets/images/cimat.png")}
             style={{ height: 150, resizeMode: "contain", marginBottom: 8 }}
           />
-          <Text style={{ fontWeight: "600", marginBottom: 4 }}>Restablecer contraseña</Text>
-          <Text style={{ fontWeight: "300" }}>Ingresa tu correo electrónico para recibir instrucciones</Text>
+          <Text style={{ fontWeight: "600", marginBottom: 4 }}>
+            Restablecer contraseña
+          </Text>
+          <Text style={{ fontWeight: "300" }}>
+            Ingresa tu correo electrónico para recibir instrucciones
+          </Text>
         </View>
         <FormControl isInvalid={!!errors.email}>
           <FormControlLabel>
@@ -103,7 +113,10 @@ export default function RestorePasswordScreen() {
         <Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
           <ButtonText>{isLoading ? "Enviando..." : "Enviar instrucciones"}</ButtonText>
         </Button>
-        <Button variant="link" onPress={() => router.replace("/login")} isDisabled={isLoading}>
+        <Button
+          variant="link"
+          onPress={() => router.replace("/login")}
+          isDisabled={isLoading}>
           <ButtonText>Volver a inicio de sesión</ButtonText>
         </Button>
       </VStack>

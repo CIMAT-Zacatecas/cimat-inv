@@ -75,17 +75,19 @@ export default function RootLayout() {
         }
 
         // Set up auth state change listener
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-          if (event === "SIGNED_IN" && session) {
-            await fetchAndSetUser(session.user);
-          } else if (event === "SIGNED_OUT") {
-            clearUser();
-          }
+        const { data: authListener } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (event === "SIGNED_IN" && session) {
+              await fetchAndSetUser(session.user);
+            } else if (event === "SIGNED_OUT") {
+              clearUser();
+            }
 
-          if (event === "PASSWORD_RECOVERY") {
-            router.push("/reset-password");
-          }
-        });
+            if (event === "PASSWORD_RECOVERY") {
+              router.push("/reset-password");
+            }
+          },
+        );
 
         return () => {
           authListener.subscription.unsubscribe();
