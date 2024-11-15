@@ -29,19 +29,9 @@ import { AlertCircleIcon } from "@/components/ui/icon";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-} from "@/components/ui/select";
-import { Text } from "@/components/ui/text";
+import SelectField from "@/components/select-field";
 import { inventoryItemSchema } from "@/schemas/inventory";
+import { Text } from "@/components/ui/text";
 
 type FormData = z.infer<typeof inventoryItemSchema>;
 
@@ -71,71 +61,47 @@ export default function EditItem() {
         descripcion: item?.descripcion || "",
         id_secundario: item?.id_secundario || "",
         codigo_barra: item?.codigo_barra || "",
-        id_categoria: item?.id_categoria || null,
-        id_estado: item?.id_estado || null,
-        id_ubicacion: item?.id_ubicacion || null,
-        id_sub_ubicacion: item?.id_sub_ubicacion || null,
-        id_responsable: item?.id_responsable || null,
-        id_subresponsable: item?.id_subresponsable || null,
+        // Convert to strings for responsable fields as per schema
+        id_responsable: item?.id_responsable?.toString() || "",
+        id_subresponsable: item?.id_subresponsable?.toString() || null,
+        // Ensure numbers for these fields as per schema
+        id_categoria: Number(item?.id_categoria) || undefined,
+        id_estado: Number(item?.id_estado) || undefined,
+        id_ubicacion: Number(item?.id_ubicacion) || undefined,
+        id_sub_ubicacion: item?.id_sub_ubicacion ? Number(item?.id_sub_ubicacion) : null,
       }),
       [item],
     ),
   });
 
+  // Add debug logging
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      console.log("Validation Errors:", errors);
+    }
+  }, [errors]);
+
+  const onSubmit = async (data: FormData) => {
+    console.log("Starting submission with data:", data);
+    try {
+      const { error } = await updateItem(id as string, data);
+      if (error) {
+        console.error("Update error:", error);
+        Alert.alert("Error", error);
+        return;
+      }
+      Alert.alert("Éxito", "Item actualizado correctamente", [
+        { text: "OK", onPress: () => router.back() },
+      ]);
+    } catch (e) {
+      console.error("Submission error:", e);
+      Alert.alert("Error", "Ocurrió un error al actualizar el item");
+    }
+  };
+
   const formValues = watch();
   const selectedUbicacion = formValues.id_ubicacion;
   const { subLocations } = useSubLocations(selectedUbicacion || undefined);
-
-  const getDisplayValue = useMemo(
-    () => ({
-      categoria: formValues.id_categoria
-        ? categories.find((c) => c.id === formValues.id_categoria)?.nombre
-        : item?.id_categoria
-          ? categories.find((c) => c.id === item.id_categoria)?.nombre
-          : "",
-      estado: formValues.id_estado
-        ? statuses.find((s) => s.id === formValues.id_estado)?.nombre
-        : item?.id_estado
-          ? statuses.find((s) => s.id === item.id_estado)?.nombre
-          : "",
-      ubicacion: formValues.id_ubicacion
-        ? locations.find((l) => l.id === formValues.id_ubicacion)?.nombre
-        : item?.id_ubicacion
-          ? locations.find((l) => l.id === item.id_ubicacion)?.nombre
-          : "",
-      subUbicacion: formValues.id_sub_ubicacion
-        ? subLocations.find((s) => s.id === formValues.id_sub_ubicacion)?.nombre
-        : item?.id_sub_ubicacion
-          ? subLocations.find((s) => s.id === item.id_sub_ubicacion)?.nombre
-          : "",
-      responsable: formValues.id_responsable
-        ? users.find((u) => u.id === formValues.id_responsable)?.full_name ||
-          users.find((u) => u.id === formValues.id_responsable)?.username
-        : item?.id_responsable
-          ? users.find((u) => u.id === item.id_responsable)?.full_name ||
-            users.find((u) => u.id === item.id_responsable)?.username
-          : "",
-      subresponsable: formValues.id_subresponsable
-        ? users.find((u) => u.id === formValues.id_subresponsable)?.full_name ||
-          users.find((u) => u.id === formValues.id_subresponsable)?.username
-        : item?.id_subresponsable
-          ? users.find((u) => u.id === item.id_subresponsable)?.full_name ||
-            users.find((u) => u.id === item.id_subresponsable)?.username
-          : "",
-    }),
-    [formValues, item, categories, statuses, locations, subLocations, users],
-  );
-
-  const onSubmit = async (data: FormData) => {
-    const { error } = await updateItem(id as string, data);
-    if (error) {
-      Alert.alert("Error", error);
-      return;
-    }
-    Alert.alert("Éxito", "Item actualizado correctamente", [
-      { text: "OK", onPress: () => router.back() },
-    ]);
-  };
 
   if (isLoadingItem) {
     return (
@@ -201,7 +167,7 @@ export default function EditItem() {
               </FormControlError>
             </FormControl>
 
-            <FormControl>
+            <FormControl isInvalid={!!errors.id_secundario}>
               <FormControlLabel>
                 <FormControlLabelText>ID Secundario (Opcional)</FormControlLabelText>
               </FormControlLabel>
@@ -219,11 +185,17 @@ export default function EditItem() {
                   </Input>
                 )}
               />
+              <FormControlError>
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText>
+                  {errors.id_secundario?.message}
+                </FormControlErrorText>
+              </FormControlError>
             </FormControl>
 
-            <FormControl>
+            <FormControl isInvalid={!!errors.codigo_barra}>
               <FormControlLabel>
-                <FormControlLabelText>Código de Barras (Opcional)</FormControlLabelText>
+                <FormControlLabelText>Código de Barras</FormControlLabelText>
               </FormControlLabel>
               <Controller
                 control={control}
@@ -239,240 +211,93 @@ export default function EditItem() {
                   </Input>
                 )}
               />
+              <FormControlError>
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText>
+                  {errors.codigo_barra?.message}
+                </FormControlErrorText>
+              </FormControlError>
             </FormControl>
 
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText>Categoría</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                control={control}
-                name="id_categoria"
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    selectedValue={value?.toString()}
-                    onValueChange={(val) => onChange(val ? Number(val) : null)}>
-                    <SelectTrigger>
-                      <SelectInput
-                        placeholder="Seleccione una categoría"
-                        value={getDisplayValue.categoria}
-                      />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {categories.map((cat) => (
-                          <SelectItem
-                            key={cat.id}
-                            label={cat.nombre}
-                            value={cat.id.toString()}
-                          />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <SelectField
+              name="id_categoria"
+              control={control}
+              label="Categoría"
+              placeholder="Seleccione una categoría"
+              options={categories}
+              error={errors.id_categoria?.message}
+              required
+            />
 
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText>Estado</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                control={control}
-                name="id_estado"
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    selectedValue={value?.toString()}
-                    onValueChange={(val) => onChange(val ? Number(val) : null)}>
-                    <SelectTrigger>
-                      <SelectInput
-                        placeholder="Seleccione un estado"
-                        value={getDisplayValue.estado}
-                      />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {statuses.map((status) => (
-                          <SelectItem
-                            key={status.id}
-                            label={status.nombre}
-                            value={status.id.toString()}
-                          />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <SelectField
+              name="id_estado"
+              control={control}
+              label="Estado"
+              placeholder="Seleccione un estado"
+              options={statuses}
+              error={errors.id_estado?.message}
+              required
+            />
 
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText>Ubicación</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                control={control}
-                name="id_ubicacion"
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    selectedValue={value?.toString()}
-                    onValueChange={(val) => {
-                      const newValue = val ? Number(val) : null;
-                      onChange(newValue);
-                      if (value !== newValue) {
-                        setValue("id_sub_ubicacion", null);
-                      }
-                    }}>
-                    <SelectTrigger>
-                      <SelectInput
-                        placeholder="Seleccione una ubicación"
-                        value={getDisplayValue.ubicacion}
-                      />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {locations.map((loc) => (
-                          <SelectItem
-                            key={loc.id}
-                            label={loc.nombre}
-                            value={loc.id.toString()}
-                          />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <SelectField
+              name="id_ubicacion"
+              control={control}
+              label="Ubicación"
+              placeholder="Seleccione una ubicación"
+              options={locations}
+              error={errors.id_ubicacion?.message}
+              required
+              onValueChange={(val: string | null) => {
+                if (val !== watch("id_ubicacion")?.toString()) {
+                  setValue("id_sub_ubicacion", null);
+                }
+              }}
+            />
 
             {selectedUbicacion && (
-              <FormControl>
-                <FormControlLabel>
-                  <FormControlLabelText>Sub-ubicación</FormControlLabelText>
-                </FormControlLabel>
-                <Controller
-                  control={control}
-                  name="id_sub_ubicacion"
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      selectedValue={value?.toString()}
-                      onValueChange={(val) => onChange(val ? Number(val) : null)}>
-                      <SelectTrigger>
-                        <SelectInput
-                          placeholder="Seleccione una sub-ubicación"
-                          value={getDisplayValue.subUbicacion}
-                        />
-                      </SelectTrigger>
-                      <SelectPortal>
-                        <SelectBackdrop />
-                        <SelectContent>
-                          <SelectDragIndicatorWrapper>
-                            <SelectDragIndicator />
-                          </SelectDragIndicatorWrapper>
-                          {subLocations.map((subLoc) => (
-                            <SelectItem
-                              key={subLoc.id}
-                              label={subLoc.nombre}
-                              value={subLoc.id.toString()}
-                            />
-                          ))}
-                        </SelectContent>
-                      </SelectPortal>
-                    </Select>
-                  )}
-                />
-              </FormControl>
+              <SelectField
+                name="id_sub_ubicacion"
+                control={control}
+                label="Sub-ubicación"
+                placeholder="Seleccione una sub-ubicación"
+                options={subLocations}
+                error={errors.id_sub_ubicacion?.message}
+                isOptional
+              />
             )}
 
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText>Responsable</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                control={control}
-                name="id_responsable"
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    selectedValue={value?.toString()}
-                    onValueChange={(val) => onChange(val || null)}>
-                    <SelectTrigger>
-                      <SelectInput
-                        placeholder="Seleccione un responsable"
-                        value={getDisplayValue.responsable || undefined}
-                      />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {users.map((user) => (
-                          <SelectItem
-                            key={user.id}
-                            label={user.full_name || user.username || "No disponible"}
-                            value={user.id}
-                          />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <SelectField
+              name="id_responsable"
+              control={control}
+              label="Responsable"
+              placeholder="Seleccione un responsable"
+              options={users.map((user) => ({
+                id: user.id.toString(),
+                nombre: user.full_name || user.username || "No disponible",
+              }))}
+              error={errors.id_responsable?.message}
+              required
+            />
 
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText>Sub-responsable</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                control={control}
-                name="id_subresponsable"
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    selectedValue={value?.toString()}
-                    onValueChange={(val) => onChange(val || null)}>
-                    <SelectTrigger>
-                      <SelectInput
-                        placeholder="Seleccione un sub-responsable"
-                        value={getDisplayValue.subresponsable || undefined}
-                      />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {users.map((user) => (
-                          <SelectItem
-                            key={user.id}
-                            label={user.full_name || user.username || "No disponible"}
-                            value={user.id}
-                          />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <SelectField
+              name="id_subresponsable"
+              control={control}
+              label="Sub-responsable"
+              placeholder="Seleccione un sub-responsable"
+              options={users.map((user) => ({
+                id: user.id.toString(),
+                nombre: user.full_name || user.username || "No disponible",
+              }))}
+              error={errors.id_subresponsable?.message}
+              isOptional
+            />
 
-            <Button onPress={handleSubmit(onSubmit)}>
-              <ButtonText>Actualizar Item</ButtonText>
+            <Button
+              onPress={handleSubmit(onSubmit)}
+              isDisabled={isSubmitting || Object.keys(errors).length > 0}>
+              <ButtonText>
+                {isSubmitting ? "Actualizando..." : "Actualizar Item"}
+              </ButtonText>
             </Button>
           </VStack>
         </Card>
