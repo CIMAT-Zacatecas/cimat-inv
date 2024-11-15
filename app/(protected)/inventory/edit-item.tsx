@@ -3,7 +3,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useInventoryMutations } from "@/hooks/inventory/useInventoryMutations";
 import { useInventoryItem } from "@/hooks/inventory/useInventory";
 import {
@@ -56,39 +56,75 @@ export default function EditItem() {
   const { locations } = useLocations();
   const { data: users = [] } = useUsers();
 
-  const [selectedValues, setSelectedValues] = useState({
-    categoria: "",
-    estado: "",
-    ubicacion: "",
-    subUbicacion: "",
-    responsable: "",
-    subresponsable: "",
-  });
-
   const {
     control,
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(inventoryItemSchema),
-    defaultValues: {
-      id_primario: "",
-      descripcion: "",
-      id_secundario: "",
-      codigo_barra: "",
-      id_categoria: null,
-      id_estado: null,
-      id_ubicacion: null,
-      id_sub_ubicacion: null,
-      id_responsable: null,
-      id_subresponsable: null,
-    },
+    defaultValues: useMemo(
+      () => ({
+        id_primario: item?.id_primario || "",
+        descripcion: item?.descripcion || "",
+        id_secundario: item?.id_secundario || "",
+        codigo_barra: item?.codigo_barra || "",
+        id_categoria: item?.id_categoria || null,
+        id_estado: item?.id_estado || null,
+        id_ubicacion: item?.id_ubicacion || null,
+        id_sub_ubicacion: item?.id_sub_ubicacion || null,
+        id_responsable: item?.id_responsable || null,
+        id_subresponsable: item?.id_subresponsable || null,
+      }),
+      [item],
+    ),
   });
 
-  const selectedUbicacion = watch("id_ubicacion");
+  const formValues = watch();
+  const selectedUbicacion = formValues.id_ubicacion;
   const { subLocations } = useSubLocations(selectedUbicacion || undefined);
+
+  const getDisplayValue = useMemo(
+    () => ({
+      categoria: formValues.id_categoria
+        ? categories.find((c) => c.id === formValues.id_categoria)?.nombre
+        : item?.id_categoria
+          ? categories.find((c) => c.id === item.id_categoria)?.nombre
+          : "",
+      estado: formValues.id_estado
+        ? statuses.find((s) => s.id === formValues.id_estado)?.nombre
+        : item?.id_estado
+          ? statuses.find((s) => s.id === item.id_estado)?.nombre
+          : "",
+      ubicacion: formValues.id_ubicacion
+        ? locations.find((l) => l.id === formValues.id_ubicacion)?.nombre
+        : item?.id_ubicacion
+          ? locations.find((l) => l.id === item.id_ubicacion)?.nombre
+          : "",
+      subUbicacion: formValues.id_sub_ubicacion
+        ? subLocations.find((s) => s.id === formValues.id_sub_ubicacion)?.nombre
+        : item?.id_sub_ubicacion
+          ? subLocations.find((s) => s.id === item.id_sub_ubicacion)?.nombre
+          : "",
+      responsable: formValues.id_responsable
+        ? users.find((u) => u.id === formValues.id_responsable)?.full_name ||
+          users.find((u) => u.id === formValues.id_responsable)?.username
+        : item?.id_responsable
+          ? users.find((u) => u.id === item.id_responsable)?.full_name ||
+            users.find((u) => u.id === item.id_responsable)?.username
+          : "",
+      subresponsable: formValues.id_subresponsable
+        ? users.find((u) => u.id === formValues.id_subresponsable)?.full_name ||
+          users.find((u) => u.id === formValues.id_subresponsable)?.username
+        : item?.id_subresponsable
+          ? users.find((u) => u.id === item.id_subresponsable)?.full_name ||
+            users.find((u) => u.id === item.id_subresponsable)?.username
+          : "",
+    }),
+    [formValues, item, categories, statuses, locations, subLocations, users],
+  );
 
   const onSubmit = async (data: FormData) => {
     const { error } = await updateItem(id as string, data);
@@ -100,41 +136,6 @@ export default function EditItem() {
       { text: "OK", onPress: () => router.back() },
     ]);
   };
-
-  // Add this useEffect to set form data when item loads
-  useEffect(() => {
-    if (item) {
-      reset({
-        id_primario: item.id_primario,
-        descripcion: item.descripcion,
-        id_secundario: item.id_secundario || "",
-        codigo_barra: item.codigo_barra || "",
-        id_categoria: item.id_categoria,
-        id_estado: item.id_estado,
-        id_ubicacion: item.id_ubicacion,
-        id_sub_ubicacion: item.id_sub_ubicacion,
-        id_responsable: item.id_responsable,
-        id_subresponsable: item.id_subresponsable,
-      });
-
-      // Also update the selected values state for dropdowns
-      setSelectedValues({
-        categoria: categories.find((c) => c.id === item.id_categoria)?.nombre || "",
-        estado: statuses.find((s) => s.id === item.id_estado)?.nombre || "",
-        ubicacion: locations.find((l) => l.id === item.id_ubicacion)?.nombre || "",
-        subUbicacion:
-          subLocations.find((s) => s.id === item.id_sub_ubicacion)?.nombre || "",
-        responsable:
-          users.find((u) => u.id === item.id_responsable)?.full_name ||
-          users.find((u) => u.id === item.id_responsable)?.username ||
-          "",
-        subresponsable:
-          users.find((u) => u.id === item.id_subresponsable)?.full_name ||
-          users.find((u) => u.id === item.id_subresponsable)?.username ||
-          "",
-      });
-    }
-  }, [item, categories, statuses, locations, subLocations, users, reset]);
 
   if (isLoadingItem) {
     return (
@@ -250,21 +251,11 @@ export default function EditItem() {
                 render={({ field: { onChange, value } }) => (
                   <Select
                     selectedValue={value?.toString()}
-                    onValueChange={(val) => {
-                      onChange(val ? Number(val) : null);
-                      const newCategory = categories.find((c) => c.id === Number(val));
-                      setSelectedValues((prev) => ({
-                        ...prev,
-                        categoria: newCategory?.nombre || "",
-                      }));
-                    }}>
+                    onValueChange={(val) => onChange(val ? Number(val) : null)}>
                     <SelectTrigger>
                       <SelectInput
                         placeholder="Seleccione una categoría"
-                        value={
-                          categories.find((c) => c.id === value)?.nombre ||
-                          selectedValues.categoria
-                        }
+                        value={getDisplayValue.categoria}
                       />
                     </SelectTrigger>
                     <SelectPortal>
@@ -297,21 +288,11 @@ export default function EditItem() {
                 render={({ field: { onChange, value } }) => (
                   <Select
                     selectedValue={value?.toString()}
-                    onValueChange={(val) => {
-                      onChange(val ? Number(val) : null);
-                      const newStatus = statuses.find((s) => s.id === Number(val));
-                      setSelectedValues((prev) => ({
-                        ...prev,
-                        estado: newStatus?.nombre || "",
-                      }));
-                    }}>
+                    onValueChange={(val) => onChange(val ? Number(val) : null)}>
                     <SelectTrigger>
                       <SelectInput
                         placeholder="Seleccione un estado"
-                        value={
-                          statuses.find((s) => s.id === value)?.nombre ||
-                          selectedValues.estado
-                        }
+                        value={getDisplayValue.estado}
                       />
                     </SelectTrigger>
                     <SelectPortal>
@@ -345,22 +326,16 @@ export default function EditItem() {
                   <Select
                     selectedValue={value?.toString()}
                     onValueChange={(val) => {
-                      onChange(val ? Number(val) : null);
-                      const newLocation = locations.find((l) => l.id === Number(val));
-                      setSelectedValues((prev) => ({
-                        ...prev,
-                        ubicacion: newLocation?.nombre || "",
-                        subUbicacion: "",
-                      }));
-                      control._reset({ id_sub_ubicacion: null });
+                      const newValue = val ? Number(val) : null;
+                      onChange(newValue);
+                      if (value !== newValue) {
+                        setValue("id_sub_ubicacion", null);
+                      }
                     }}>
                     <SelectTrigger>
                       <SelectInput
                         placeholder="Seleccione una ubicación"
-                        value={
-                          locations.find((l) => l.id === value)?.nombre ||
-                          selectedValues.ubicacion
-                        }
+                        value={getDisplayValue.ubicacion}
                       />
                     </SelectTrigger>
                     <SelectPortal>
@@ -394,23 +369,11 @@ export default function EditItem() {
                   render={({ field: { onChange, value } }) => (
                     <Select
                       selectedValue={value?.toString()}
-                      onValueChange={(val) => {
-                        onChange(val ? Number(val) : null);
-                        const newSubLocation = subLocations.find(
-                          (s) => s.id === Number(val),
-                        );
-                        setSelectedValues((prev) => ({
-                          ...prev,
-                          subUbicacion: newSubLocation?.nombre || "",
-                        }));
-                      }}>
+                      onValueChange={(val) => onChange(val ? Number(val) : null)}>
                       <SelectTrigger>
                         <SelectInput
                           placeholder="Seleccione una sub-ubicación"
-                          value={
-                            subLocations.find((s) => s.id === value)?.nombre ||
-                            selectedValues.subUbicacion
-                          }
+                          value={getDisplayValue.subUbicacion}
                         />
                       </SelectTrigger>
                       <SelectPortal>
@@ -444,21 +407,11 @@ export default function EditItem() {
                 render={({ field: { onChange, value } }) => (
                   <Select
                     selectedValue={value?.toString()}
-                    onValueChange={(val) => {
-                      onChange(val || null);
-                      const newUser = users.find((u) => u.id === val);
-                      setSelectedValues((prev) => ({
-                        ...prev,
-                        responsable: newUser?.full_name || newUser?.username || "",
-                      }));
-                    }}>
+                    onValueChange={(val) => onChange(val || null)}>
                     <SelectTrigger>
                       <SelectInput
                         placeholder="Seleccione un responsable"
-                        value={
-                          users.find((u) => u.id === value)?.full_name ||
-                          selectedValues.responsable
-                        }
+                        value={getDisplayValue.responsable || undefined}
                       />
                     </SelectTrigger>
                     <SelectPortal>
@@ -495,12 +448,7 @@ export default function EditItem() {
                     <SelectTrigger>
                       <SelectInput
                         placeholder="Seleccione un sub-responsable"
-                        value={
-                          selectedValues.subresponsable ||
-                          users.find((u) => u.id === value)?.full_name ||
-                          users.find((u) => u.id === value)?.username ||
-                          "No disponible"
-                        }
+                        value={getDisplayValue.subresponsable || undefined}
                       />
                     </SelectTrigger>
                     <SelectPortal>

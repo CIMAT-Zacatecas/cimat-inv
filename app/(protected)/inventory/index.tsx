@@ -1,16 +1,17 @@
-import { Text, View } from "react-native";
-import Container from "@/components/ui/container";
-import { useInventoryList } from "@/hooks/inventory/useInventory";
-import { useAppFocus } from "@/hooks/core/useAppState";
-import { useInventoryFilters } from "@/hooks/inventory/useInventoryFilters";
-import { Spinner } from "@/components/ui/spinner";
-import { router } from "expo-router";
-import { Bien } from "@/types/types";
+import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
-import { Separator } from "@/components/ui/separator";
-import BienItem from "@/components/bienItem";
-import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Search } from "lucide-react-native";
+import { useInventoryList } from "@/hooks/inventory/useInventory";
+import { useInventoryFilters } from "@/hooks/inventory/useInventoryFilters";
+import { useAppFocus } from "@/hooks/core/useAppState";
+import Container from "@/components/ui/container";
+import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
+import { Card } from "@/components/ui/card";
+import { Input, InputField, InputIcon } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectTrigger,
@@ -22,12 +23,16 @@ import {
   SelectDragIndicator,
   SelectItem,
 } from "@/components/ui/select";
-import { VStack } from "@/components/ui/vstack";
-import { HStack } from "@/components/ui/hstack";
-import { Card } from "@/components/ui/card";
+import BienItem from "@/components/bienItem";
+import type { Bien } from "@/types/types";
 
 export default function Inventory() {
+  const router = useRouter();
+
+  // 1. Fetch inventory data
   const { data: bienes = [], isLoading, error, refetch } = useInventoryList();
+
+  // 2. Setup filters - this will now handle all metadata fetching internally
   const {
     filters,
     setFilters,
@@ -38,6 +43,7 @@ export default function Inventory() {
     locationOptions,
   } = useInventoryFilters(bienes);
 
+  // 3. Setup app focus refresh
   useAppFocus(refetch);
 
   const handlePress = (bien: Bien) => {
@@ -77,6 +83,7 @@ export default function Inventory() {
           </Input>
 
           <HStack space="sm">
+            {/* Category Filter */}
             <Select
               className="flex-1"
               selectedValue={filters.categoryId?.toString()}
@@ -107,6 +114,7 @@ export default function Inventory() {
               </SelectPortal>
             </Select>
 
+            {/* Status Filter */}
             <Select
               className="flex-1"
               selectedValue={filters.statusId?.toString()}
@@ -137,6 +145,7 @@ export default function Inventory() {
               </SelectPortal>
             </Select>
 
+            {/* Location Filter */}
             <Select
               className="flex-1"
               selectedValue={filters.locationId?.toString()}
@@ -167,6 +176,11 @@ export default function Inventory() {
               </SelectPortal>
             </Select>
           </HStack>
+
+          {/* Optional: Show count of filtered items */}
+          <Text className="text-sm text-gray-500">
+            Mostrando {filteredItems.length} de {bienes.length} items
+          </Text>
         </VStack>
       </Card>
 
@@ -184,6 +198,8 @@ export default function Inventory() {
           keyExtractor={(item) => item.id_primario.toString()}
           contentContainerClassName="pb-5"
           ItemSeparatorComponent={() => <Separator height={8} />}
+          refreshing={isLoading}
+          onRefresh={refetch}
         />
       )}
     </Container>
