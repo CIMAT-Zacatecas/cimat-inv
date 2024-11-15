@@ -4,16 +4,16 @@ import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { useInventoryItem } from "@/hooks/useInventory";
+import { useInventoryItem } from "@/hooks/inventory/useInventory";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react-native";
-import { useItemOperations } from "@/hooks/useInventoryOperations";
+import { useInventoryMutations } from "@/hooks/inventory/useInventoryMutations";
 
 export default function ItemDetail() {
   const { id } = useLocalSearchParams();
   const { data: bien, isLoading, error } = useInventoryItem(id as string);
-  const { deleteItem } = useItemOperations();
+  const { deleteItem } = useInventoryMutations();
 
   const handleEdit = () => {
     router.push(`/inventory/edit-item?id=${id}`);

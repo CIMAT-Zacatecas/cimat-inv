@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateItem } from "@/hooks/useCreateItem";
+import { useInventoryMutations } from "@/hooks/inventory/useInventoryMutations";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import Container from "@/components/ui/container";
@@ -32,25 +32,13 @@ import {
   SelectDragIndicator,
   SelectItem,
 } from "@/components/ui/select";
+import { inventoryItemSchema } from "@/schemas/inventory";
 
-const createItemSchema = z.object({
-  id_primario: z.string().min(1, "El ID primario es obligatorio"),
-  descripcion: z.string().min(1, "La descripción es obligatoria"),
-  id_secundario: z.string().optional(),
-  codigo_barra: z.string().optional(),
-  id_categoria: z.number().nullable(),
-  id_estado: z.number().nullable(),
-  id_ubicacion: z.number().nullable(),
-  id_sub_ubicacion: z.number().nullable(),
-  id_responsable: z.string().nullable(),
-  id_subresponsable: z.string().nullable(),
-});
-
-type FormData = z.infer<typeof createItemSchema>;
+type FormData = z.infer<typeof inventoryItemSchema>;
 
 export default function CreateItem() {
   const router = useRouter();
-  const { createItem, isLoading } = useCreateItem();
+  const { createItem, isLoading } = useInventoryMutations();
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -110,7 +98,7 @@ export default function CreateItem() {
     watch,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(createItemSchema),
+    resolver: zodResolver(inventoryItemSchema),
     defaultValues: {
       id_primario: "",
       descripcion: "",

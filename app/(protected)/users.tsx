@@ -6,23 +6,13 @@ import { HStack } from "@/components/ui/hstack";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { Separator } from "@/components/ui/separator";
-import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
-import { useUsers } from "@/hooks/useUsers";
+import { useAppFocus } from "@/hooks/core/useAppState";
+import { useUsers } from "@/hooks/user/useUser";
 import { Profile } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { Center } from "@/components/ui/center";
-
-const getRoleName = (roleId: number) => {
-  switch (roleId) {
-    case ROLES.ADMIN:
-      return "Administrador";
-    case ROLES.USER:
-      return "Usuario";
-    default:
-      return "Desconocido";
-  }
-};
+import { getRoleName } from "@/utils/utils";
 
 const UserItem = ({ user }: { user: Profile }) => (
   <Card size="md" variant="elevated">
@@ -57,7 +47,7 @@ const UserItem = ({ user }: { user: Profile }) => (
 export default function Users() {
   const { data: users = [], isLoading, error, refetch } = useUsers();
 
-  useRefreshOnFocus(refetch);
+  useAppFocus(refetch);
 
   if (isLoading) {
     return (

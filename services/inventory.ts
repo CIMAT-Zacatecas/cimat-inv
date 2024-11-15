@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { InventoryFilters } from "@/types/filters";
 import { Bien, BienInsert, BienWithRelations } from "@/types/types";
 
 export const inventoryService = {
@@ -157,5 +158,50 @@ export const inventoryService = {
       .order("full_name");
     if (error) throw error;
     return data || [];
+  },
+
+  async getFilteredInventory(filters: InventoryFilters) {
+    let query = supabase.from("bienes").select(`
+        *,
+        categoria:categorias(*),
+        estado:estados_bienes(*),
+        ubicacion:ubicaciones(*),
+        sub_ubicacion:sub_ubicaciones(*),
+        responsable:profiles!bienes_id_responsable_fkey(*),
+        subresponsable:profiles!bienes_id_subresponsable_fkey(*)
+      `);
+
+    if (filters.search) {
+      query = query.or(
+        `descripcion.ilike.%${filters.search}%,id_primario.ilike.%${filters.search}%`,
+      );
+    }
+
+    if (filters.categoryId) {
+      query = query.eq("id_categoria", filters.categoryId);
+    }
+
+    if (filters.statusId) {
+      query = query.eq("id_estado", filters.statusId);
+    }
+
+    if (filters.locationId) {
+      query = query.eq("id_ubicacion", filters.locationId);
+    }
+
+    const { data, error } = await query.returns<BienWithRelations[]>();
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getTotalCount() {
+    const { count, error } = await supabase
+      .from("bienes")
+      .select("*", { count: "exact" });
+
+    if (error) throw error;
+
+    return count;
   },
 };

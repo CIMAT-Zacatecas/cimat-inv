@@ -1,12 +1,12 @@
 import { Text } from "react-native";
 import { router } from "expo-router";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useAuthUser } from "@/hooks/user/useUser";
 import { BienWithRelations } from "@/types/types";
 import Container from "@/components/ui/container";
 import { FlashList } from "@shopify/flash-list";
 import { Separator } from "@/components/ui/separator";
-import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
-import { useUserInventory } from "@/hooks/useInventory";
+import { useAppFocus } from "@/hooks/core/useAppState";
+import { useUserInventory } from "@/hooks/inventory/useInventory";
 import { Spinner } from "@/components/ui/spinner";
 import React from "react";
 import BienItem from "@/components/bienItem";
@@ -20,7 +20,7 @@ export default function HomeScreen() {
     refetch,
   } = useUserInventory(user.profile?.id);
 
-  useRefreshOnFocus(refetch);
+  useAppFocus(refetch);
 
   const handlePress = (bien: BienWithRelations) => {
     router.push({

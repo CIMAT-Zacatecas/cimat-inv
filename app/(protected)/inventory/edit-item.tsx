@@ -4,14 +4,15 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
-import { useEditItem } from "@/hooks/useEditItem";
-import { useInventoryItem } from "@/hooks/useInventory";
+import { useInventoryMutations } from "@/hooks/inventory/useInventoryMutations";
+import { useInventoryItem } from "@/hooks/inventory/useInventory";
 import {
   useCategories,
   useStatuses,
   useLocations,
   useSubLocations,
-} from "@/hooks/useInventoryData";
+} from "@/hooks/inventory/useInventoryMetadata";
+import { useUsers } from "@/hooks/user/useUser";
 import Container from "@/components/ui/container";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { VStack } from "@/components/ui/vstack";
@@ -40,36 +41,21 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
-import { useUsers } from "@/hooks/useUsers";
+import { inventoryItemSchema } from "@/schemas/inventory";
 
-const updateItemSchema = z.object({
-  id_primario: z.string().min(1, "El ID primario es obligatorio"),
-  descripcion: z.string().min(1, "La descripción es obligatoria"),
-  id_secundario: z.string().optional(),
-  codigo_barra: z.string().optional(),
-  id_categoria: z.number().nullable(),
-  id_estado: z.number().nullable(),
-  id_ubicacion: z.number().nullable(),
-  id_sub_ubicacion: z.number().nullable(),
-  id_responsable: z.string().nullable(),
-  id_subresponsable: z.string().nullable(),
-});
-
-type FormData = z.infer<typeof updateItemSchema>;
+type FormData = z.infer<typeof inventoryItemSchema>;
 
 export default function EditItem() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
 
-  // Use our new hooks
-  const { updateItem, isLoading: isUpdating } = useEditItem();
+  const { updateItem, isLoading: isUpdating } = useInventoryMutations();
   const { data: item, isLoading: isLoadingItem } = useInventoryItem(id as string);
-  const { data: categories = [] } = useCategories();
-  const { data: statuses = [] } = useStatuses();
-  const { data: locations = [] } = useLocations();
+  const { categories } = useCategories();
+  const { statuses } = useStatuses();
+  const { locations } = useLocations();
   const { data: users = [] } = useUsers();
 
-  // Form and UI state stays in component
   const [selectedValues, setSelectedValues] = useState({
     categoria: "",
     estado: "",
@@ -86,7 +72,7 @@ export default function EditItem() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
-    resolver: zodResolver(updateItemSchema),
+    resolver: zodResolver(inventoryItemSchema),
     defaultValues: {
       id_primario: "",
       descripcion: "",
@@ -102,9 +88,8 @@ export default function EditItem() {
   });
 
   const selectedUbicacion = watch("id_ubicacion");
-  const { data: subLocations = [] } = useSubLocations(selectedUbicacion || undefined);
+  const { subLocations } = useSubLocations(selectedUbicacion || undefined);
 
-  // Form submission handler
   const onSubmit = async (data: FormData) => {
     const { error } = await updateItem(id as string, data);
     if (error) {

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { inventoryService } from "@/services/inventory";
-import { BienWithRelations } from "@/types/types";
+import type { BienWithRelations } from "@/types/types";
 
-export function useInventory() {
+export function useInventoryList() {
   return useQuery<BienWithRelations[]>({
     queryKey: ["inventory"],
     queryFn: () => inventoryService.getAll(),

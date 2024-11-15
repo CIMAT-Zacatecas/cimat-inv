@@ -4,7 +4,7 @@ import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { useInventoryItem } from "@/hooks/useInventory";
+import { useInventoryItem } from "@/hooks/inventory/useInventory";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function ItemDetail() {

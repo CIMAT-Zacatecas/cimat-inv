@@ -1,8 +1,8 @@
 import { Text, View } from "react-native";
 import Container from "@/components/ui/container";
-import { useInventory } from "@/hooks/useInventory";
-import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
-import { useInventoryFilters } from "@/hooks/useInventoryFilters";
+import { useInventoryList } from "@/hooks/inventory/useInventory";
+import { useAppFocus } from "@/hooks/core/useAppState";
+import { useInventoryFilters } from "@/hooks/inventory/useInventoryFilters";
 import { Spinner } from "@/components/ui/spinner";
 import { router } from "expo-router";
 import { Bien } from "@/types/types";
@@ -27,7 +27,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Card } from "@/components/ui/card";
 
 export default function Inventory() {
-  const { data: bienes = [], isLoading, error, refetch } = useInventory();
+  const { data: bienes = [], isLoading, error, refetch } = useInventoryList();
   const {
     filters,
     setFilters,
@@ -38,7 +38,7 @@ export default function Inventory() {
     locationOptions,
   } = useInventoryFilters(bienes);
 
-  useRefreshOnFocus(refetch);
+  useAppFocus(refetch);
 
   const handlePress = (bien: Bien) => {
     router.push({
