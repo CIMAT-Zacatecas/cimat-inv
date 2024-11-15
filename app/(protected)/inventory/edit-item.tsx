@@ -3,8 +3,15 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react";
+import { useEditItem } from "@/hooks/useEditItem";
+import { useInventoryItem } from "@/hooks/useInventory";
+import {
+  useCategories,
+  useStatuses,
+  useLocations,
+  useSubLocations,
+} from "@/hooks/useInventoryData";
 import Container from "@/components/ui/container";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { VStack } from "@/components/ui/vstack";
@@ -33,7 +40,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
-import { useEffect, useState } from "react";
+import { useUsers } from "@/hooks/useUsers";
 
 const updateItemSchema = z.object({
   id_primario: z.string().min(1, "El ID primario es obligatorio"),
@@ -53,80 +60,23 @@ type FormData = z.infer<typeof updateItemSchema>;
 export default function EditItem() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
-  // Fetch item data
-  const { data: item, isLoading: isLoadingItem } = useQuery({
-    queryKey: ["item", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bienes")
-        .select(
-          `
-          *,
-          categoria:categorias(*),
-          estado:estados_bienes(*),
-          ubicacion:ubicaciones(*),
-          sub_ubicacion:sub_ubicaciones(*),
-          responsable:profiles!bienes_id_responsable_fkey(*),
-          subresponsable:profiles!bienes_id_subresponsable_fkey(*)
-        `,
-        )
-        .eq("id_primario", id)
-        .single();
+  // Use our new hooks
+  const { updateItem, isLoading: isUpdating } = useEditItem();
+  const { data: item, isLoading: isLoadingItem } = useInventoryItem(id as string);
+  const { data: categories = [] } = useCategories();
+  const { data: statuses = [] } = useStatuses();
+  const { data: locations = [] } = useLocations();
+  const { data: users = [] } = useUsers();
 
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Reuse the same queries from create-item.tsx
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categorias")
-        .select("*")
-        .order("nombre");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: statuses = [] } = useQuery({
-    queryKey: ["statuses"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("estados_bienes")
-        .select("*")
-        .order("nombre");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: locations = [] } = useQuery({
-    queryKey: ["locations"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("ubicaciones")
-        .select("*")
-        .order("nombre");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: users = [] } = useQuery({
-    queryKey: ["users"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("full_name");
-      if (error) throw error;
-      return data;
-    },
+  // Form and UI state stays in component
+  const [selectedValues, setSelectedValues] = useState({
+    categoria: "",
+    estado: "",
+    ubicacion: "",
+    subUbicacion: "",
+    responsable: "",
+    subresponsable: "",
   });
 
   const {
@@ -151,24 +101,29 @@ export default function EditItem() {
     },
   });
 
-  // Add state for selected values
-  const [selectedValues, setSelectedValues] = useState({
-    categoria: "",
-    estado: "",
-    ubicacion: "",
-    subUbicacion: "",
-    responsable: "",
-    subresponsable: "",
-  });
+  const selectedUbicacion = watch("id_ubicacion");
+  const { data: subLocations = [] } = useSubLocations(selectedUbicacion || undefined);
 
-  // Update the useEffect that sets form values to also set selected values
+  // Form submission handler
+  const onSubmit = async (data: FormData) => {
+    const { error } = await updateItem(id as string, data);
+    if (error) {
+      Alert.alert("Error", error);
+      return;
+    }
+    Alert.alert("Éxito", "Item actualizado correctamente", [
+      { text: "OK", onPress: () => router.back() },
+    ]);
+  };
+
+  // Add this useEffect to set form data when item loads
   useEffect(() => {
     if (item) {
       reset({
         id_primario: item.id_primario,
         descripcion: item.descripcion,
-        id_secundario: item.id_secundario || undefined,
-        codigo_barra: item.codigo_barra || undefined,
+        id_secundario: item.id_secundario || "",
+        codigo_barra: item.codigo_barra || "",
         id_categoria: item.id_categoria,
         id_estado: item.id_estado,
         id_ubicacion: item.id_ubicacion,
@@ -177,52 +132,24 @@ export default function EditItem() {
         id_subresponsable: item.id_subresponsable,
       });
 
+      // Also update the selected values state for dropdowns
       setSelectedValues({
-        categoria: item.categoria?.nombre || "",
-        estado: item.estado?.nombre || "",
-        ubicacion: item.ubicacion?.nombre || "",
-        subUbicacion: item.sub_ubicacion?.nombre || "",
-        responsable: item.responsable?.full_name || item.responsable?.username || "",
+        categoria: categories.find((c) => c.id === item.id_categoria)?.nombre || "",
+        estado: statuses.find((s) => s.id === item.id_estado)?.nombre || "",
+        ubicacion: locations.find((l) => l.id === item.id_ubicacion)?.nombre || "",
+        subUbicacion:
+          subLocations.find((s) => s.id === item.id_sub_ubicacion)?.nombre || "",
+        responsable:
+          users.find((u) => u.id === item.id_responsable)?.full_name ||
+          users.find((u) => u.id === item.id_responsable)?.username ||
+          "",
         subresponsable:
-          item.subresponsable?.full_name || item.subresponsable?.username || "",
+          users.find((u) => u.id === item.id_subresponsable)?.full_name ||
+          users.find((u) => u.id === item.id_subresponsable)?.username ||
+          "",
       });
     }
-  }, [item, reset]);
-
-  const selectedUbicacion = watch("id_ubicacion");
-  const { data: subLocations = [] } = useQuery({
-    queryKey: ["subLocations", selectedUbicacion],
-    queryFn: async () => {
-      if (!selectedUbicacion) return [];
-      const { data, error } = await supabase
-        .from("sub_ubicaciones")
-        .select("*")
-        .eq("id_ubicacion", selectedUbicacion)
-        .order("nombre");
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!selectedUbicacion,
-  });
-
-  const onSubmit = async (data: FormData) => {
-    try {
-      const { error } = await supabase.from("bienes").update(data).eq("id_primario", id);
-
-      if (error) throw error;
-
-      // Invalidate queries to refetch data
-      queryClient.invalidateQueries({ queryKey: ["item", id] });
-      queryClient.invalidateQueries({ queryKey: ["inventory"] });
-
-      Alert.alert("Éxito", "Item actualizado correctamente", [
-        { text: "OK", onPress: () => router.back() },
-      ]);
-    } catch (error) {
-      console.error("[EditItem] Error updating item:", error);
-      Alert.alert("Error", "No se pudo actualizar el item");
-    }
-  };
+  }, [item, categories, statuses, locations, subLocations, users, reset]);
 
   if (isLoadingItem) {
     return (

@@ -115,4 +115,47 @@ export const inventoryService = {
 
     return true;
   },
+
+  async getCategories() {
+    const { data, error } = await supabase.from("categorias").select("*").order("nombre");
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getStatuses() {
+    const { data, error } = await supabase
+      .from("estados_bienes")
+      .select("*")
+      .order("nombre");
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getLocations() {
+    const { data, error } = await supabase
+      .from("ubicaciones")
+      .select("*")
+      .order("nombre");
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getSubLocations(locationId: number) {
+    const { data, error } = await supabase
+      .from("sub_ubicaciones")
+      .select("*")
+      .eq("id_ubicacion", locationId)
+      .order("nombre");
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getUsers() {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("full_name");
+    if (error) throw error;
+    return data || [];
+  },
 };
