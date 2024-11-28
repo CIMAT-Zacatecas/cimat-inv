@@ -113,7 +113,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GluestackUIProvider mode="system">
+      <GluestackUIProvider mode="light">
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <Slot />
         </ThemeProvider>

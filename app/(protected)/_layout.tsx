@@ -59,7 +59,6 @@ export default function ProtectedLayout() {
           tabBarIcon: ({ color }) => (
             <FontAwesome name="qrcode" size={24} color={color} />
           ),
-          href: null,
         }}
       />
       <Tabs.Screen

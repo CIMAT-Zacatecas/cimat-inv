@@ -272,8 +272,9 @@ export default function EditItem() {
               label="Responsable"
               placeholder="Seleccione un responsable"
               options={users.map((user) => ({
-                id: user.id.toString(),
-                nombre: user.full_name || user.username || "No disponible",
+                id: user.profile.id.toString(),
+                nombre:
+                  user.profile.full_name || user.profile.username || "No disponible",
               }))}
               error={errors.id_responsable?.message}
               required
@@ -285,8 +286,9 @@ export default function EditItem() {
               label="Sub-responsable"
               placeholder="Seleccione un sub-responsable"
               options={users.map((user) => ({
-                id: user.id.toString(),
-                nombre: user.full_name || user.username || "No disponible",
+                id: user.profile.id.toString(),
+                nombre:
+                  user.profile.full_name || user.profile.username || "No disponible",
               }))}
               error={errors.id_subresponsable?.message}
               isOptional

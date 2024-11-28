@@ -1,4 +1,3 @@
-import { ROLES } from "@/constants/Roles";
 import Container from "@/components/ui/container";
 import { FlashList } from "@shopify/flash-list";
 import { VStack } from "@/components/ui/vstack";
@@ -8,36 +7,40 @@ import { Text } from "@/components/ui/text";
 import { Separator } from "@/components/ui/separator";
 import { useAppFocus } from "@/hooks/core/useAppState";
 import { useUsers } from "@/hooks/user/useUser";
-import { Profile } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Center } from "@/components/ui/center";
 import { getRoleName } from "@/utils/utils";
+import { UserWithAuth } from "@/services/users";
 
-const UserItem = ({ user }: { user: Profile }) => (
+const UserItem = ({ user }: { user: UserWithAuth }) => (
   <Card size="md" variant="elevated">
     <HStack space="md">
       <Center>
         <Avatar size="md">
-          <AvatarFallbackText>
-            {user.full_name || user.username || "?"}
-          </AvatarFallbackText>
+          {user.profile.avatar_url ? (
+            <AvatarImage source={{ uri: user.profile.avatar_url }} />
+          ) : (
+            <AvatarFallbackText>
+              {user.profile.full_name || user.profile.username || "?"}
+            </AvatarFallbackText>
+          )}
         </Avatar>
       </Center>
       <VStack space="sm">
         <HStack space="md">
           <Text bold>Nombre:</Text>
-          <Text>{user.full_name || "No especificado"}</Text>
+          <Text>{user.profile.full_name || "No especificado"}</Text>
         </HStack>
 
         <HStack space="md">
           <Text bold>Email:</Text>
-          <Text>{user.username || "No especificado"}</Text>
+          <Text>{user.authUser?.email || "No especificado"}</Text>
         </HStack>
 
         <HStack space="md">
           <Text bold>Rol:</Text>
-          <Text>{getRoleName(user.id_rol)}</Text>
+          <Text>{getRoleName(user.profile.id_rol)}</Text>
         </HStack>
       </VStack>
     </HStack>
@@ -85,7 +88,7 @@ export default function Users() {
         estimatedItemSize={50}
         data={users}
         renderItem={({ item }) => <UserItem user={item} />}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.profile.id}
         contentContainerClassName="pb-5"
         ItemSeparatorComponent={() => <Separator height={8} />}
       />
