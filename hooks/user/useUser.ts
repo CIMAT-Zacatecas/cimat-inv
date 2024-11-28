@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { usersService } from "@/services/users";
+import { usersService, UserWithAuth } from "@/services/users";
 import { useUserStore } from "@/store/userStore";
-import type { Profile } from "@/types/types";
 import { User } from "@/types/user";
 
 export function useUsers() {
-  return useQuery<Profile[]>({
+  return useQuery<UserWithAuth[]>({
     queryKey: ["users"],
     queryFn: () => usersService.getAll(),
   });

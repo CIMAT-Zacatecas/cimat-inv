@@ -23,10 +23,9 @@
         "expo-camera",
         {
           "cameraPermission": "Permita que $(PRODUCT_NAME) acceda a su cámara."
-          // "microphonePermission": "Permita que $(PRODUCT_NAME) to access your microphone",
-          // "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-font"
     ],
     "scheme": "cimat-inv",
     "slug": "cimat-inv",

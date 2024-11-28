@@ -4,8 +4,10 @@ const getRoleName = (roleId: number) => {
   switch (roleId) {
     case ROLES.ADMIN:
       return "Administrador";
+    case ROLES.RESEARCHER:
+      return "Investigador";
     case ROLES.USER:
-      return "Usuario";
+      return "Alumno";
     default:
       return "Desconocido";
   }

@@ -1,5 +1,8 @@
 import type { Database } from "@/types/supabase"; // Adjust the import path if necessary
 
+// Extracted type for the 'users_view' view
+export type UserView = Database["public"]["Views"]["users_view"]["Row"];
+
 // Extracted types for the 'bienes' table
 export type Bien = Database["public"]["Tables"]["bienes"]["Row"];
 export type BienInsert = Database["public"]["Tables"]["bienes"]["Insert"];
