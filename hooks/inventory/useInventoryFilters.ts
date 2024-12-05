@@ -64,7 +64,10 @@ export function useInventoryFilters(items: BienWithRelations[]) {
   );
 
   const locationOptions: SelectOption[] = useMemo(
-    () => locations.map((loc) => ({ label: loc.nombre, value: loc.id })),
+    () =>
+      [...locations]
+        .sort((a, b) => a.codigo.localeCompare(b.codigo))
+        .map((loc) => ({ label: `${loc.codigo} - ${loc.nombre}`, value: loc.id })),
     [locations],
   );
 

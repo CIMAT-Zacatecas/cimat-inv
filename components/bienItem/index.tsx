@@ -20,7 +20,7 @@ const BienItem = ({
           {bien.estado && (
             <Text
               className={
-                bien.estado.nombre === "activo" ? "text-green-600" : "text-red-600"
+                bien.estado.nombre === "asignado" ? "text-green-600" : "text-red-600"
               }>
               {bien.estado.nombre}
             </Text>
@@ -31,7 +31,9 @@ const BienItem = ({
 
         <HStack space="md" className="justify-between">
           {bien.ubicacion && (
-            <Text className="text-sm text-gray-600">📍 {bien.ubicacion.nombre}</Text>
+            <Text className="text-sm text-gray-600">
+              📍 {bien.ubicacion.codigo} - {bien.ubicacion.nombre}
+            </Text>
           )}
           {bien.categoria && (
             <Text className="text-sm text-gray-600">{bien.categoria.nombre}</Text>
