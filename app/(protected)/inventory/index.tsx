@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import BienItem from "@/components/bienItem";
 import type { Bien } from "@/types/types";
+import { ScrollView } from "react-native";
 
 export default function Inventory() {
   const router = useRouter();
@@ -72,7 +73,7 @@ export default function Inventory() {
 
   return (
     <Container removeVerticalPadding>
-      <Card className="mb-4 mt-4">
+      <Card className="my-4">
         <VStack space="md">
           <Input>
             <InputField
@@ -160,18 +161,20 @@ export default function Inventory() {
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />
-                <SelectContent>
+                <SelectContent style={{ maxHeight: 600 }}>
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
-                  <SelectItem label="Todas" value="" />
-                  {locationOptions.map((option) => (
-                    <SelectItem
-                      key={option.value}
-                      label={option.label}
-                      value={option.value.toString()}
-                    />
-                  ))}
+                  <ScrollView nestedScrollEnabled={true}>
+                    <SelectItem label="Todas" value="" />
+                    {locationOptions.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        label={option.label}
+                        value={option.value.toString()}
+                      />
+                    ))}
+                  </ScrollView>
                 </SelectContent>
               </SelectPortal>
             </Select>
