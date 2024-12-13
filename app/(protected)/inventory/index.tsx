@@ -25,7 +25,10 @@ import {
 } from "@/components/ui/select";
 import BienItem from "@/components/bienItem";
 import type { Bien } from "@/types/types";
-import { ScrollView } from "react-native";
+import { ScrollView, Platform } from "react-native";
+import { Plus } from "lucide-react-native";
+import { Fab, FabIcon, FabLabel } from "@/components/ui/fab";
+import React from "react";
 
 export default function Inventory() {
   const router = useRouter();
@@ -54,6 +57,10 @@ export default function Inventory() {
     });
   };
 
+  const handleCreateItem = () => {
+    router.push("/inventory/create-item");
+  };
+
   if (error) {
     return (
       <Container centered>
@@ -70,6 +77,8 @@ export default function Inventory() {
       </Container>
     );
   }
+
+  console.log("[Inventory] Platform.OS:", Platform.OS); // Debug platform
 
   return (
     <Container removeVerticalPadding>
@@ -205,6 +214,27 @@ export default function Inventory() {
           refreshing={isLoading}
           onRefresh={refetch}
         />
+      )}
+
+      {Platform.OS !== "ios" && (
+        <Fab
+          onPress={() => {
+            handleCreateItem();
+          }}
+          placement="bottom right"
+          size="lg"
+          className="bg-primary-500">
+          <FabIcon
+            stroke="white"
+            as={Plus}
+            onPress={() => {
+              handleCreateItem();
+            }}
+            size="md"
+            color="white"
+          />
+          <FabLabel>Crear</FabLabel>
+        </Fab>
       )}
     </Container>
   );

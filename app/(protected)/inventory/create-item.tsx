@@ -113,12 +113,12 @@ export default function CreateItem() {
       descripcion: "",
       id_secundario: "",
       codigo_barra: "",
-      id_categoria: undefined,
-      id_estado: undefined,
-      id_ubicacion: undefined,
-      id_sub_ubicacion: undefined,
-      id_responsable: undefined,
-      id_subresponsable: undefined,
+      id_categoria: null,
+      id_estado: null,
+      id_ubicacion: null,
+      id_sub_ubicacion: null,
+      id_responsable: null,
+      id_subresponsable: null,
     },
   });
 
