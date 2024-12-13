@@ -1,7 +1,7 @@
 import { Alert, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
+import { undefined, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useInventoryMutations } from "@/hooks/inventory/useInventoryMutations";
 import { useQuery } from "@tanstack/react-query";
@@ -33,6 +33,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { inventoryItemSchema } from "@/schemas/inventory";
+import { useMemo } from "react";
 
 type FormData = z.infer<typeof inventoryItemSchema>;
 
@@ -70,14 +71,21 @@ export default function CreateItem() {
   const { data: locations = [] } = useQuery({
     queryKey: ["locations"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("ubicaciones")
-        .select("*")
-        .order("nombre");
+      const { data, error } = await supabase.from("ubicaciones").select("*");
       if (error) throw error;
       return data;
     },
   });
+
+  const locationOptions = useMemo(() => {
+    // Ordenar por "codigo" y mapear a { label, value }
+    return [...locations]
+      .sort((a, b) => a.codigo.localeCompare(b.codigo))
+      .map((loc) => ({
+        label: `${loc.codigo} - ${loc.nombre}`,
+        value: loc.id,
+      }));
+  }, [locations]);
 
   // Fetch users for responsable/subresponsable
   const { data: users = [] } = useQuery({
@@ -97,6 +105,7 @@ export default function CreateItem() {
     handleSubmit,
     watch,
     formState: { errors },
+    setValue,
   } = useForm<FormData>({
     resolver: zodResolver(inventoryItemSchema),
     defaultValues: {
@@ -151,7 +160,7 @@ export default function CreateItem() {
   return (
     <Container removeVerticalPadding>
       <ScrollView>
-        <Card className="mb-4 mt-4">
+        <Card className="my-4">
           <VStack space="md">
             <FormControl isInvalid={!!errors.id_primario}>
               <FormControlLabel>
@@ -163,6 +172,7 @@ export default function CreateItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese el ID primario"
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -187,6 +197,7 @@ export default function CreateItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese la descripción"
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -213,6 +224,7 @@ export default function CreateItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese el ID secundario"
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -233,6 +245,7 @@ export default function CreateItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese el código de barras"
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -243,7 +256,7 @@ export default function CreateItem() {
               />
             </FormControl>
 
-            <FormControl>
+            <FormControl isInvalid={!!errors.id_categoria}>
               <FormControlLabel>
                 <FormControlLabelText>Categoría</FormControlLabelText>
               </FormControlLabel>
@@ -255,7 +268,10 @@ export default function CreateItem() {
                     selectedValue={value?.toString()}
                     onValueChange={(val) => onChange(val ? Number(val) : null)}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione una categoría" />
+                      <SelectInput
+                        placeholder="Seleccione una categoría"
+                        className="h-12"
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -275,9 +291,15 @@ export default function CreateItem() {
                   </Select>
                 )}
               />
+              <FormControlError>
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText>
+                  {errors.id_categoria?.message}
+                </FormControlErrorText>
+              </FormControlError>
             </FormControl>
 
-            <FormControl>
+            <FormControl isInvalid={!!errors.id_estado}>
               <FormControlLabel>
                 <FormControlLabelText>Estado</FormControlLabelText>
               </FormControlLabel>
@@ -289,7 +311,7 @@ export default function CreateItem() {
                     selectedValue={value?.toString()}
                     onValueChange={(val) => onChange(val ? Number(val) : null)}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione un estado" />
+                      <SelectInput placeholder="Seleccione un estado" className="h-12" />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -309,9 +331,13 @@ export default function CreateItem() {
                   </Select>
                 )}
               />
+              <FormControlError>
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText>{errors.id_estado?.message}</FormControlErrorText>
+              </FormControlError>
             </FormControl>
 
-            <FormControl>
+            <FormControl isInvalid={!!errors.id_ubicacion}>
               <FormControlLabel>
                 <FormControlLabelText>Ubicación</FormControlLabelText>
               </FormControlLabel>
@@ -324,32 +350,44 @@ export default function CreateItem() {
                     onValueChange={(val) => {
                       onChange(val ? Number(val) : null);
                       // Reset sub_ubicacion when ubicacion changes
-                      control._reset({ id_sub_ubicacion: null });
+                      setValue("id_sub_ubicacion", null);
+                      // control._reset({ id_sub_ubicacion: null });
                     }}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione una ubicación" />
+                      <SelectInput
+                        placeholder="Seleccione una ubicación"
+                        className="h-12"
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
-                      <SelectContent>
+                      <SelectContent style={{ maxHeight: 600 }}>
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
-                        {locations.map((loc) => (
-                          <SelectItem
-                            key={loc.id}
-                            label={loc.nombre}
-                            value={loc.id.toString()}
-                          />
-                        ))}
+                        <ScrollView nestedScrollEnabled={true}>
+                          {locationOptions.map((option) => (
+                            <SelectItem
+                              key={option.value}
+                              label={option.label}
+                              value={option.value.toString()}
+                            />
+                          ))}
+                        </ScrollView>
                       </SelectContent>
                     </SelectPortal>
                   </Select>
                 )}
               />
+              <FormControlError>
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText>
+                  {errors.id_ubicacion?.message}
+                </FormControlErrorText>
+              </FormControlError>
             </FormControl>
 
-            {selectedUbicacion && (
+            {selectedUbicacion && subLocations.length > 0 && (
               <FormControl>
                 <FormControlLabel>
                   <FormControlLabelText>Sub-ubicación</FormControlLabelText>
@@ -362,7 +400,10 @@ export default function CreateItem() {
                       selectedValue={value?.toString()}
                       onValueChange={(val) => onChange(val ? Number(val) : null)}>
                       <SelectTrigger>
-                        <SelectInput placeholder="Seleccione una sub-ubicación" />
+                        <SelectInput
+                          placeholder="Seleccione una sub-ubicación"
+                          className="h-12"
+                        />
                       </SelectTrigger>
                       <SelectPortal>
                         <SelectBackdrop />
@@ -385,7 +426,7 @@ export default function CreateItem() {
               </FormControl>
             )}
 
-            <FormControl>
+            <FormControl isInvalid={!!errors.id_responsable}>
               <FormControlLabel>
                 <FormControlLabelText>Responsable</FormControlLabelText>
               </FormControlLabel>
@@ -397,7 +438,10 @@ export default function CreateItem() {
                     selectedValue={value?.toString()}
                     onValueChange={(val) => onChange(val || null)}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione un responsable" />
+                      <SelectInput
+                        placeholder="Seleccione un responsable"
+                        className="h-12"
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -417,6 +461,12 @@ export default function CreateItem() {
                   </Select>
                 )}
               />
+              <FormControlError>
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText>
+                  {errors.id_responsable?.message}
+                </FormControlErrorText>
+              </FormControlError>
             </FormControl>
 
             <FormControl>
@@ -431,7 +481,10 @@ export default function CreateItem() {
                     selectedValue={value?.toString()}
                     onValueChange={(val) => onChange(val || null)}>
                     <SelectTrigger>
-                      <SelectInput placeholder="Seleccione un sub-responsable" />
+                      <SelectInput
+                        placeholder="Seleccione un sub-responsable"
+                        className="h-12"
+                      />
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
@@ -453,7 +506,11 @@ export default function CreateItem() {
               />
             </FormControl>
 
-            <Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
+            <Button
+              onPress={handleSubmit(onSubmit, (errors) => {
+                console.log("Errores de validación:", errors);
+              })}
+              isDisabled={isLoading}>
               <ButtonText>{isLoading ? "Creando..." : "Crear Item"}</ButtonText>
             </Button>
           </VStack>

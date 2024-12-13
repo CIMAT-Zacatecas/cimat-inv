@@ -84,7 +84,6 @@
     "react-dom": "18.3.1",
     "react-hook-form": "^7.53.0",
     "react-native": "0.76.3",
-    "react-native-barcode-creator": "^0.1.7",
     "react-native-qrcode-svg": "^6.3.12",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "4.12.0",
