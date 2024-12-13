@@ -18,15 +18,19 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@/components/ui/modal";
-import { Card } from "@/components/ui/card";
 import BienItem from "@/components/bienItem";
 import { router } from "expo-router";
+import { Camera } from "lucide-react-native";
+import { useAppFocus } from "@/hooks/core/useAppState";
 
 export default function Scanner() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [isScanning, setIsScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [scannedItemId, setScannedItemId] = useState<string | null>(null);
+  // const [previouslyScannedIds, setPreviouslyScannedIds] = useState<Set<string>>(
+  //   new Set(),
+  // );
   const [permission, requestPermission] = useCameraPermissions();
 
   // Fetch item details when we have a scanned ID
@@ -57,12 +61,9 @@ export default function Scanner() {
 
   const handleBarCodeScanned = ({ type, data }: BarcodeScanningResult) => {
     setIsScanning(true);
-    console.log("Scanned type:", type);
-    console.log("Scanned data:", data);
     try {
       if (type === "qr") {
         const scannedData = JSON.parse(data);
-        console.log("Parsed QR data:", scannedData);
         if (scannedData.id_primario) {
           setScannedItemId(scannedData.id_primario);
           setShowModal(true);
@@ -81,15 +82,16 @@ export default function Scanner() {
 
   const handleItemPress = () => {
     if (scannedItem) {
+      setShowModal(false);
       router.push({
-        pathname: "/inventory/item-detail",
+        pathname: "/home/item-detail",
         params: { id: scannedItem.id_primario },
       });
     }
   };
 
   return (
-    <Container>
+    <Container removePadding>
       <CameraView
         facing={facing}
         onBarcodeScanned={isScanning ? undefined : handleBarCodeScanned}
@@ -97,9 +99,15 @@ export default function Scanner() {
           barcodeTypes: ["qr", "ean13"],
         }}
         style={{ flex: 1 }}>
-        <View>
-          <TouchableOpacity onPress={toggleCameraFacing}>
-            <Text>Cambiar cámara</Text>
+        <View style={{ position: "absolute", top: 16, right: 16 }}>
+          <TouchableOpacity
+            onPress={toggleCameraFacing}
+            style={{
+              backgroundColor: "rgba(0,0,0,0.3)",
+              padding: 8,
+              borderRadius: 8,
+            }}>
+            <Camera size={24} color="white" />
           </TouchableOpacity>
         </View>
       </CameraView>

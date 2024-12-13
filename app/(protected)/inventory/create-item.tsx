@@ -113,12 +113,12 @@ export default function CreateItem() {
       descripcion: "",
       id_secundario: "",
       codigo_barra: "",
-      id_categoria: null,
-      id_estado: null,
-      id_ubicacion: null,
-      id_sub_ubicacion: null,
-      id_responsable: null,
-      id_subresponsable: null,
+      id_categoria: undefined,
+      id_estado: undefined,
+      id_ubicacion: undefined,
+      id_sub_ubicacion: undefined,
+      id_responsable: undefined,
+      id_subresponsable: undefined,
     },
   });
 
@@ -237,7 +237,7 @@ export default function CreateItem() {
 
             <FormControl>
               <FormControlLabel>
-                <FormControlLabelText>Código de Barras (Opcional)</FormControlLabelText>
+                <FormControlLabelText>Código de Barras</FormControlLabelText>
               </FormControlLabel>
               <Controller
                 control={control}
@@ -275,7 +275,7 @@ export default function CreateItem() {
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
-                      <SelectContent>
+                      <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
@@ -315,7 +315,7 @@ export default function CreateItem() {
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
-                      <SelectContent>
+                      <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
@@ -361,7 +361,7 @@ export default function CreateItem() {
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
-                      <SelectContent style={{ maxHeight: 600 }}>
+                      <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
@@ -407,7 +407,7 @@ export default function CreateItem() {
                       </SelectTrigger>
                       <SelectPortal>
                         <SelectBackdrop />
-                        <SelectContent>
+                        <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                           <SelectDragIndicatorWrapper>
                             <SelectDragIndicator />
                           </SelectDragIndicatorWrapper>
@@ -445,7 +445,7 @@ export default function CreateItem() {
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
-                      <SelectContent>
+                      <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
@@ -488,7 +488,7 @@ export default function CreateItem() {
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />
-                      <SelectContent>
+                      <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
