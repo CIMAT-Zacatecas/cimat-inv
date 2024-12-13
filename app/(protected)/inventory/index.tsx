@@ -99,7 +99,7 @@ export default function Inventory() {
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />
-                <SelectContent>
+                <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
@@ -130,7 +130,7 @@ export default function Inventory() {
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />
-                <SelectContent>
+                <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
@@ -161,7 +161,7 @@ export default function Inventory() {
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />
-                <SelectContent style={{ maxHeight: 600 }}>
+                <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>

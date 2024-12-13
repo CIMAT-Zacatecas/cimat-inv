@@ -107,7 +107,9 @@ export default function ItemDetail() {
                   <Text className="text-typography-900" bold>
                     Ubicación:
                   </Text>
-                  <Text>{bien.ubicacion.nombre}</Text>
+                  <Text>
+                    {bien.ubicacion.codigo} - {bien.ubicacion.nombre}
+                  </Text>
                 </HStack>
               )}
 

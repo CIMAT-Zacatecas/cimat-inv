@@ -81,7 +81,7 @@ function SelectField({
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />
-                <SelectContent>
+                <SelectContent style={{ maxHeight: 600, minHeight: 300 }}>
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
