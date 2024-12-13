@@ -124,6 +124,7 @@ export default function LoginScreen() {
                   value={value}
                   autoCapitalize="none"
                   keyboardType="email-address"
+                  className="h-12"
                 />
               </Input>
             )}
@@ -149,6 +150,7 @@ export default function LoginScreen() {
                   onChangeText={onChange}
                   value={value}
                   secureTextEntry={!showPassword}
+                  className="h-12"
                 />
                 <InputSlot onPress={togglePasswordVisibility}>
                   <InputIcon as={showPassword ? EyeOffIcon : EyeIcon} />

@@ -13,12 +13,34 @@ export default function MyProfile() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert("Error", error.message);
-    } else {
-      clearUser();
-      router.replace("/login");
+    try {
+      // Verificar la sesión actual
+      const session = await supabase.auth.getSession();
+
+      if (!session?.data?.session) {
+        console.warn("No active session found. Redirecting to login...");
+        clearUser(); // Limpia cualquier estado de usuario en el store
+        router.replace("/login"); // Redirige a la pantalla de inicio de sesión
+        return;
+      }
+
+      // Intentar cerrar sesión
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error during logout:", error);
+        Alert.alert("Error", error.message);
+        clearUser();
+        router.replace("/login");
+      } else {
+        clearUser();
+        router.replace("/login");
+      }
+    } catch (error) {
+      console.error("Unexpected error during logout:", error);
+      Alert.alert(
+        "Error",
+        "Ocurrió un error inesperado. Por favor, inténtalo nuevamente.",
+      );
     }
   };
 

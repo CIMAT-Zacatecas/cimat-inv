@@ -79,6 +79,7 @@ export default function Inventory() {
             <InputField
               placeholder="Buscar por ID o descripción..."
               onChangeText={debouncedSetSearch}
+              className="h-12"
             />
             <InputIcon as={Search} />
           </Input>
@@ -95,7 +96,7 @@ export default function Inventory() {
                 }))
               }>
               <SelectTrigger>
-                <SelectInput placeholder="Categoría" />
+                <SelectInput placeholder="Categoría" className="h-12" />
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />
@@ -126,7 +127,7 @@ export default function Inventory() {
                 }))
               }>
               <SelectTrigger>
-                <SelectInput placeholder="Estado" />
+                <SelectInput placeholder="Estado" className="h-12" />
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />
@@ -157,7 +158,7 @@ export default function Inventory() {
                 }))
               }>
               <SelectTrigger>
-                <SelectInput placeholder="Ubicación" />
+                <SelectInput placeholder="Ubicación" className="h-12" />
               </SelectTrigger>
               <SelectPortal>
                 <SelectBackdrop />

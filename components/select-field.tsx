@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { AlertCircleIcon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { ScrollView } from "react-native";
 
 type SelectFieldProps = {
   name: string;
@@ -77,6 +78,7 @@ function SelectField({
                 <SelectInput
                   placeholder={placeholder}
                   value={selectedOption?.nombre || ""}
+                  className="h-12"
                 />
               </SelectTrigger>
               <SelectPortal>
@@ -85,13 +87,15 @@ function SelectField({
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
-                  {options.map((opt) => (
-                    <SelectItem
-                      key={opt.id}
-                      label={opt.nombre}
-                      value={opt.id.toString()}
-                    />
-                  ))}
+                  <ScrollView nestedScrollEnabled={true}>
+                    {options.map((opt) => (
+                      <SelectItem
+                        key={opt.id}
+                        label={opt.nombre}
+                        value={opt.id.toString()}
+                      />
+                    ))}
+                  </ScrollView>
                 </SelectContent>
               </SelectPortal>
             </Select>

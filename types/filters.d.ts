@@ -5,6 +5,7 @@ export type InventoryFilters = {
   categoryId?: number;
   statusId?: number;
   locationId?: number;
+  responsableId?: number;
 };
 
 export type SelectOption = {

@@ -2,11 +2,18 @@
   "expo": {
     "newArchEnabled": true,
     "android": {
+      "minSdkVersion": 21,
+      "targetSdkVersion": 34,
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
-      "package": "cimat.inv"
+      "package": "cimat.inv",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET"
+      ]
     },
     "experiments": {
       "typedRoutes": true
@@ -42,11 +49,14 @@
       "favicon": "./assets/images/favicon.png",
       "output": "static"
     },
+    "owner": "sergio.salazar.cimat",
     "extra": {
+      "router": {
+        "origin": false
+      },
       "eas": {
-        "projectId": "09f17a7d-b995-499d-9e22-8f6d3048ed43"
+        "projectId": "0280e555-f6fd-4ea4-be40-041a65bffe81"
       }
-    },
-    "owner": "robertovillegas-cimat"
+    }
   }
 }

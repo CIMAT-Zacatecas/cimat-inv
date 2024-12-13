@@ -50,7 +50,6 @@ export default function EditItem() {
     control,
     handleSubmit,
     watch,
-    reset,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
@@ -115,7 +114,7 @@ export default function EditItem() {
   return (
     <Container removeVerticalPadding>
       <ScrollView>
-        <Card className="mb-4 mt-4">
+        <Card className="my-4">
           <VStack space="md">
             <FormControl isInvalid={!!errors.id_primario}>
               <FormControlLabel>
@@ -127,6 +126,7 @@ export default function EditItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese el ID primario"
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -151,6 +151,7 @@ export default function EditItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese la descripción"
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -177,6 +178,7 @@ export default function EditItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese el ID secundario"
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -203,6 +205,7 @@ export default function EditItem() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input>
                     <InputField
+                      className="h-12"
                       placeholder="Ingrese el código de barras"
                       onBlur={onBlur}
                       onChangeText={onChange}
